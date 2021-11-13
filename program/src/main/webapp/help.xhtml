@@ -1,0 +1,81 @@
+<?xml version = "1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+>
+
+<h:head>
+    <title>#{msg['facelet.label.title-help']}</title>
+    <meta name="viewport" content="width=device-width"/>
+    <link rel="shortcut icon" type="image/x-icon" href="#{request.contextPath}/svg/favicon.ico"/>
+
+    <!-- Librarys -->
+    <link rel="stylesheet" href="css/bootstrap.css" media="all"/>
+    <link rel="stylesheet" href="css/dataTables.bootstrap4.min.css" media="all"/>
+    <link rel="stylesheet" href="css/select2.min.css" media="all"/>
+    <link rel="stylesheet" href="css/font-awesome.css" media="all"/>
+    <link rel="stylesheet" href="css/line-awesome.min.css" media="all"/>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/main.css" media="all"/>
+
+    <!-- Load early for Darkmode -->
+    <script type="text/javascript" src="js/libs/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="js/modules/darkmode_load.js"></script>
+</h:head>
+<h:body>
+    <!-- Custom Primfaces Theme -->
+    <link rel="stylesheet" href="css/components.css" media="all"/>
+    <f:view locale="#{localeController.currentLocale}">
+        <ui:insert>
+            <ui:include src="navigation.xhtml"/>
+        </ui:insert>
+
+        <div id="view" class="main-body #{navBarController.static}">
+            <div class="page-header l-mar-32--b">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h3 class="page-title">#{msg['facelet.label.navigation.help']}</h3>
+                        <ul class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="dashboard.xhtml">#{msg['facelet.label.navigation.dashboard']}</a></li>
+                            <li class="breadcrumb-item active">#{msg['facelet.label.navigation.help']}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <p>#{msg['core.hello-world']}</p>
+
+            <embed src="./documents/Benutzerhandbuch_Workflow_Manager.doc.pdf" width="800" height="800" />
+        </div>
+    </f:view>
+    <c:forEach items="#{localeController.getMessageQueue()}" var="message">
+        <div class="alert">
+            <div class="alert-icon">
+                <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                    <path fill="var(--color)" d="M10 3H14V14H10V3M10 21V17H14V21H10Z"/>
+                </svg>
+            </div>
+
+            <p class="alert-message">
+                <h:outputText value="#{message.getDetail()}"/>
+            </p>
+
+            <div class="spacer"></div>
+            <div class="alert-dismiss">
+                <h:form>
+                    <h:commandLink action="#{localeController.removeMessageQueue()}">close</h:commandLink>
+                </h:form>
+            </div>
+        </div>
+    </c:forEach>
+</h:body>
+<ui:insert>
+    <ui:include src="scripts.xhtml"/>
+</ui:insert>
+</html>
+
+

@@ -1,0 +1,460 @@
+<?xml version = "1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+>
+
+<h:head>
+    <title>#{msg['facelet.label.title-workstation']}</title>
+    <meta name="viewport" content="width=device-width"/>
+    <link rel="shortcut icon" type="image/x-icon" href="#{request.contextPath}/svg/favicon.ico"/>
+
+    <!-- Librarys -->
+    <link rel="stylesheet" href="css/bootstrap.css" media="all"/>
+    <link rel="stylesheet" href="css/dataTables.bootstrap4.min.css" media="all"/>
+    <link rel="stylesheet" href="css/select2.min.css" media="all"/>
+    <link rel="stylesheet" href="css/font-awesome.css" media="all"/>
+    <link rel="stylesheet" href="css/line-awesome.min.css" media="all"/>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/main.css" media="all"/>
+
+    <!-- Load early for Darkmode -->
+    <script type="text/javascript" src="js/libs/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="js/modules/darkmode_load.js"></script>
+
+    <!-- Scripts that need to be launched in the header -->
+    <script type="text/javascript" src="js/modules/validate.js"></script>
+    <script type="text/javascript" src="js/modules/selectBoxes.js"></script>
+</h:head>
+<h:body>
+    <!-- Custom Primfaces Theme -->
+    <link rel="stylesheet" href="css/components.css" media="all"/>
+    <f:view locale="#{localeController.currentLocale}">
+        <ui:insert>
+            <ui:include src="navigation.xhtml"/>
+        </ui:insert>
+
+        <div id="view" class="main-body #{navBarController.static}">
+
+            <div class="page-header l-mar-32--b">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h3 class="page-title">#{msg['facelet.label.navigation.workstation']}</h3>
+                        <ul class="breadcrumb">
+                            <li class="breadcrumb-item"><a
+                                    href="dashboard.xhtml">#{msg['facelet.label.navigation.dashboard']}</a></li>
+                            <li class="breadcrumb-item"><a
+                                    href="workstations.xhtml">#{msg['facelet.label.navigation.workstations']}</a></li>
+                            <li class="breadcrumb-item active">#{msg['facelet.label.navigation.workstation']}</li>
+                        </ul>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label><h:outputText
+                                    value="#{msg['facelet.label.workstation']}"/></label>
+                            <h:form>
+                                <h:selectOneMenu class="select"
+                                                 value="#{workstationController.entity}"
+                                                 converter="workstationConverter"
+                                                 onchange="submit()"
+                                                 valueChangeListener="#{workstationController.handleSinglePageSelect}">
+                                    <f:selectItems value="#{workstationsController.allForCurrentTechnologe}"
+                                                   var="workstation"
+                                                   itemLabel="#{workstation.name}" itemValue="#{workstation}"/>
+                                </h:selectOneMenu>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h:panelGroup id="status-bar">
+                <div class="row text-center single-centering">
+                    <div class="l-grid-4">
+                        <h1>
+                            #{userController.getExecutingUser().firstName} #{userController.getExecutingUser().lastName}
+                        </h1>
+                        <small class="text-muted">#{msg['facelet.label.workstation-activ']}</small>
+                    </div>
+                    <div class="l-grid-4">
+                        <h1>
+                            <h:panelGroup style="cursor:pointer" rendered="#{workstationController.entity.active}">
+                                <span class="badge bg-inverse-success" data-toggle="modal"
+                                      data-target="#toggle_active_state">#{msg['facelet.label.active']}</span>
+                            </h:panelGroup>
+                            <h:panelGroup style="cursor:pointer" rendered="#{workstationController.entity.active == false}">
+                                <span class="badge bg-inverse-danger" data-toggle="modal"
+                                      data-target="#toggle_active_state">#{msg['facelet.label.inactive']}</span>
+                            </h:panelGroup>
+                        </h1>
+                        <small class="text-muted">#{msg['facelet.label.workstation-status']}</small>
+                    </div>
+                    <div class="l-grid-4">
+                        <h1>
+                            <h:panelGroup style="cursor:pointer" rendered="#{workstationController.entity.broken}">
+                                <span class="badge bg-inverse-danger" data-toggle="modal"
+                                      data-target="#toggle_broken_state">#{msg['facelet.label.broken']}</span>
+                            </h:panelGroup>
+                            <h:panelGroup style="cursor:pointer" rendered="#{workstationController.entity.broken == false}">
+                                <span class="badge bg-inverse-success" data-toggle="modal"
+                                      data-target="#toggle_broken_state">#{msg['facelet.label.not-broken']}</span>
+                            </h:panelGroup>
+                        </h1>
+                        <small class="text-muted">#{msg['facelet.label.workstation-service']}</small>
+                    </div>
+                </div>
+            </h:panelGroup>
+            <div class="l-grid-12">
+                <div class="single-centering">
+                    <h3> #{msg['facelet.label.workstation-todo']} </h3>
+                </div>
+
+                <!--                AUSGABE ALS TABELLE         -->
+                <h:panelGroup id="procedure-table">
+                    <div class="row">
+                        <div class="l-grid-12">
+                            <div class="table-responsive">
+                                <table id="curren-procedures" class="table table-striped custom-table datatable">
+                                    <thead>
+                                    <tr>
+                                        <th>#{msg['facelet.label.job']}</th>
+                                        <th>#{msg['facelet.label.processstep']}</th>
+                                        <th>#{msg['facelet.label.priority']}</th>
+                                        <th class="table-hidden d-none">Prio</th>
+                                        <th>#{msg['facelet.label.statemachine-states']}</th>
+                                        <th class="no-sort"></th>
+                                        <th class="no-sort"></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <ui:repeat
+                                            value="#{procedureController.getActiveByWorkstation(workstationController.entity)}"
+                                            var="procedure">
+                                        <tr>
+                                            <td>#{jobController.getByProcedure(procedure).name}</td>
+                                            <td>#{procedure.processStep.name}</td>
+                                            <td>
+                                                <span class="badge"
+                                                      style="background-color:#{prioritiesController.getColor(jobController.getByProcedure(procedure).priority)}">#{jobController.getByProcedure(procedure).priority.name}</span>
+                                            </td>
+                                            <td class="d-none">#{jobController.getByProcedure(procedure).priority.value}</td>
+                                            <td>
+                                                <div class="row l-mar-8--t">
+                                                    <div class="col-md-12">
+                                                        <ui:repeat
+                                                                value="#{procedure.processStep.stateMachine.stateList}"
+                                                                var="state">
+                                                            <h:panelGroup
+                                                                    rendered="#{stateController.isComplete(state, procedure)}">
+                                                                <a class="help-cursor" style="text-decoration: none;" data-toggle="tooltip"
+                                                                   data-placement="top"
+                                                                   title="#{state.name}">
+                                                                    <span class="completed action-circle large complete-btn">
+                                                                        <em class="material-icons">check</em>
+                                                                            </span>
+                                                                </a>
+                                                            </h:panelGroup>
+                                                            <h:panelGroup
+                                                                    rendered="#{stateController.isPending(state, procedure)}">
+                                                                <a class="help-cursor" style="text-decoration: none;" data-toggle="tooltip"
+                                                                   data-placement="top"
+                                                                   title="#{state.name}">
+                                                                    <span class="pending action-circle large complete-btn">
+                                                                        <em class="material-icons">timelapse</em>
+                                                                            </span>
+                                                                </a>
+                                                            </h:panelGroup>
+                                                            <h:panelGroup
+                                                                    rendered="#{stateController.isComplete(state, procedure) == false and stateController.isPending(state, procedure) == false}">
+                                                                <a class="help-cursor" style="text-decoration: none;" data-toggle="tooltip"
+                                                                   data-placement="top"
+                                                                   title="#{state.name}">
+                                                                    <span class="action-circle large complete-btn">
+                                                                        <em class="material-icons">access_time</em>
+                                                                            </span>
+                                                                </a>
+                                                            </h:panelGroup>
+                                                        </ui:repeat>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-right">
+                                                <h:form rendered="#{procedureController.canFinish(procedure)}" onsubmit="#{stateExecController.reset()}">
+                                                    <div class="row">
+                                                        <div class="col-sm-6">
+                                                            <div class="form-group">
+                                                                <div>
+                                                                    <h:outputText
+                                                                            value="#{msg['facelet.label.transition-time']}"/>
+                                                                </div>
+                                                                <h:inputText id="transition_time" value="#{stateExecController.entity.transitionTime}"
+                                                                             class="form-control" type="text"/>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-6 m-auto">
+                                                            <span data-toggle="modal"
+                                                                  data-target="#add_assembly">
+                                                    <h:commandButton class="btn btn-primary continue-btn"
+                                                                     action="#{procedureController.updateEntity(procedure)}"
+                                                                     value="#{msg['facelet.label.doFinish']}"
+                                                                     rendered="#{procedureController.canFinish(procedure) and procedureController.isInLastExecutableStateAndCreates(procedure)}">
+                                                    <f:ajax execute="@this" render="@form"/>
+                                                    </h:commandButton></span>
+                                                            <h:commandButton class="btn btn-primary continue-btn"
+                                                                             action="#{procedureController.doFinish(procedure, stateExecController.entity.transitionTime)}"
+                                                                             value="#{msg['facelet.label.doFinish']}"
+                                                                             rendered="#{procedureController.canFinish(procedure) and not procedureController.isInLastExecutableStateAndCreates(procedure)}">
+                                                            </h:commandButton>
+                                                        </div>
+                                                    </div>
+                                                </h:form>
+                                                <h:form rendered="#{procedureController.canExecute(procedure)}">
+                                                    <h:commandButton class="btn btn-primary continue-btn"
+                                                                     action="#{procedureController.doExec(procedure)}"
+                                                                     value="#{msg['facelet.label.doExec']}">
+                                                    </h:commandButton>
+                                                </h:form>
+                                            </td>
+                                            <td class="text-right">
+                                                <h:form enctype="multipart/form-data" action="workstation.xhtml?id=#{workstationController.entity.id}">
+                                                    <span data-toggle="modal"
+                                                          data-target="#view_parameters">
+                                                                <p:commandLink
+                                                                        action="#{procedureController.updateEntity(procedure)}"
+                                                                        ajax="true"
+                                                                        styleClass="btn btn--primary">
+                                                                        <em class="fa fa-file l-pad-8--r m-r-5"></em> <h:outputText
+                                                                        value="#{msg['facelet.label.parameter']}"/>
+                                                                </p:commandLink>
+                                                                </span>
+                                                </h:form>
+                                            </td>
+                                        </tr>
+                                    </ui:repeat>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </h:panelGroup>
+            </div>
+
+            <div id="add_assembly" class="modal custom-modal fade" role="dialog" aria-modal="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><h:outputText value="#{msg['facelet.label.add-assembly']}"/></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <f:view>
+                                <f:event type="preRenderView" listener="#{assembliesController.refresh()}"/>
+                                <h:form onsubmit="#{assemblyController.reset()}">
+                                    <script type="application/javascript">update();</script>
+                                    <script type="application/javascript">select2();</script>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label><h:outputText value="#{msg['facelet.label.assemblyId']}"/><span
+                                                        class="text-danger">*</span></label>
+                                                <h:inputText id="assemblyID"
+                                                             value="#{assemblyController.entity.assemblyID}"
+                                                             class="form-control assembly-id" type="text"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label><h:outputText value="#{msg['facelet.label.alloy']}"/><span
+                                                        class="text-danger">*</span></label>
+                                                <h:inputText id="alloy" value="#{assemblyController.entity.alloy}"
+                                                             class="form-control assembly-alloy" type="text"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label><h:outputText value="#{msg['facelet.label.sampleCount']}"/><span
+                                                        class="text-danger">*</span></label>
+                                                <h:inputText id="sampleCount"
+                                                             value="#{assemblyController.entity.sampleCount}"
+                                                             class="form-control integer" type="text"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label><h:outputText value="#{msg['facelet.label.carriers']}"/><span
+                                                        class="text-danger">*</span></label>
+                                                <h:selectManyListbox class="select"
+                                                                     value="#{assemblyController.carriers}" collectionType="java.util.ArrayList">
+                                                    <c:forEach items="#{carriersController.entities}" var="carrier">
+                                                        <f:selectItem itemValue="#{carrier.id}"
+                                                                      itemLabel="#{carrier.carrierID}"/>
+                                                    </c:forEach>
+                                                </h:selectManyListbox>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label><h:outputText value="#{msg['facelet.label.comment']}"/></label>
+                                                <h:inputText id="comment" value="#{assemblyController.entity.comment}"
+                                                             class="form-control" type="email"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="submit-section">
+                                        <h:commandLink class="btn btn--primary submit-btn"
+                                                       action="#{jobController.createAndAddAndExecute(assemblyController.entity, procedureController.entity, stateExecController.entity.getTransitionTime())}">
+                                            <h:outputText value="#{msg['facelet.label.create']}"/>
+                                        </h:commandLink>
+                                    </div>
+                                </h:form>
+                            </f:view>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--                    Toggle Active State                     -->
+        <div class="modal custom-modal fade" id="toggle_active_state" role="dialog">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="form-header">
+                            <h3><h:outputText value="#{msg['facelet.label.change-workstation-state']}"/></h3>
+                            <p><h:outputText value="#{msg['facelet.label.change-workstation-state-message']}"/></p>
+                        </div>
+                        <div class="modal-btn delete-action">
+                            <div class="row">
+                                <div class="col-6">
+                                    <h:form>
+                                        <div class="submit-section">
+                                            <h:commandLink class="btn btn-primary continue-btn"
+                                                           action="#{workstationController.toggleActive}">
+                                                <h:outputText value="#{msg['facelet.label.change']}"/>
+                                            </h:commandLink>
+                                        </div>
+                                    </h:form>
+                                </div>
+                                <div class="col-6">
+                                    <a href="javascript:void(0);" data-dismiss="modal"
+                                       class="btn btn-primary cancel-btn"><h:outputText
+                                            value="#{msg['facelet.label.cancel']}"/></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--                    Toggle Broken State                     -->
+        <div class="modal custom-modal fade" id="toggle_broken_state" role="dialog">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="form-header">
+                            <h3><h:outputText value="#{msg['facelet.label.change-workstation-broken']}"/></h3>
+                            <p><h:outputText value="#{msg['facelet.label.change-workstation-broken-message']}"/></p>
+                        </div>
+                        <div class="modal-btn delete-action">
+                            <div class="row">
+                                <div class="col-6">
+                                    <h:form>
+                                        <div class="submit-section">
+                                            <h:commandLink class="btn btn-primary continue-btn"
+                                                           action="#{workstationController.toggleBroken}">
+                                                <h:outputText value="#{msg['facelet.label.change']}"/>
+                                            </h:commandLink>
+                                        </div>
+                                    </h:form>
+                                </div>
+                                <div class="col-6">
+                                    <a href="javascript:void(0);" data-dismiss="modal"
+                                       class="btn btn-primary cancel-btn"><h:outputText
+                                            value="#{msg['facelet.label.cancel']}"/></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--                           VIEW PARAMETER (POP UP)                      -->
+        <f:view id="modal-panel">
+            <div id="view_parameters" class="modal custom-modal fade" role="dialog">
+                <div class="modal-dialog modal-dialog-centered modal-l" role="document">
+                    <div class="modal-content" id="start_modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><h:outputText value="#{msg['facelet.label.parameter']}"/>
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <h:form id="view_parameters_form">
+                                <div class="row">
+                                    <div class="l-grid-12">
+                                        <div class="table-responsive">
+                                            <table id="start_processchain-table"
+                                                   class="table table-striped custom-table datatable">
+                                                <thead>
+                                                <tr>
+                                                    <th>#{msg['facelet.label.parameter']}</th>
+                                                    <th>#{msg['facelet.label.value']}</th>
+                                                    <th>#{msg['facelet.label.unit']}</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <c:forEach items="#{procedureController.entity.values}" var="value">
+                                                    <tr>
+                                                        <td>#{value.parameter.field}</td>
+                                                        <td>#{value.value}</td>
+                                                        <td>
+                                                        <h:panelGroup rendered="#{valueController.isCardinalValue(value)}">
+                                                            #{value.unit}
+                                                        </h:panelGroup>
+                                                        </td>
+                                                      </tr>
+                                                </c:forEach>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                <p:commandButton ajax="false"
+                                                 value="#{msg['facelet.label.export-param']}"
+                                                 onclick="PrimeFaces.monitorDownload(start, stop);"
+                                                 icon="fa fa-download m-r-5"
+                                                 style="display: block;width: 100%;padding: 0px !important;clear: both;font-weight: 400;color: #212529;text-align: inherit;white-space: nowrap;background-color: transparent;border: none;"
+                                                 styleClass="special-download">
+                                    <p:fileDownload
+                                            value="#{proceduresController.exportParameters(procedureController.entity)}"/>
+                                </p:commandButton>
+                                </div>
+                                </div>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </f:view>
+
+    </f:view>
+</h:body>
+<ui:insert>
+    <ui:include src="scripts.xhtml"/>
+</ui:insert>
+</html>

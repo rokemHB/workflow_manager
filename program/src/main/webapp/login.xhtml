@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:b="http://bootsfaces.net/ui" xmlns:c="http://java.sun.com/jsp/jstl/core">
+<h:head>
+    <title>#{msg['facelet.label.title-login']}</title>
+    <meta name="viewport" content="width=device-width"/>
+    <link rel="shortcut icon" type="image/x-icon" href="#{request.contextPath}/svg/favicon.ico"/>
+
+    <!-- Librarys -->
+    <link rel="stylesheet" href="css/bootstrap.css" media="all"/>
+    <link rel="stylesheet" href="css/dataTables.bootstrap4.min.css" media="all"/>
+    <link rel="stylesheet" href="css/select2.min.css" media="all"/>
+    <link rel="stylesheet" href="css/font-awesome.css" media="all"/>
+    <link rel="stylesheet" href="css/line-awesome.min.css" media="all"/>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/main.css" media="all"/>
+
+    <!-- Load early for Darkmode -->
+    <script type="text/javascript" src="js/libs/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="js/modules/darkmode_load.js"></script>
+</h:head>
+<h:body>
+    <div class="account-page">
+        <div class="main-wrapper">
+            <div class="account-content">
+                <div class="container">
+                    <div class="account-logo">
+                        <a href="dashboard.xhtml"><span class="icon-cowboy login-icon"></span></a>
+                    </div>
+                    <div class="account-box">
+                        <div class="account-wrapper">
+                            <h3 class="account-title">#{msg['login.title']}</h3>
+                            <p class="account-subtitle">#{msg['login.message.hint']}</p>
+                            <c:if test="${shiroLoginFailure != null}">
+                                <div class="l-mar-16--b" style="color: red">
+                                    <span class="flex-row"> <em class="far fa-times-circle l-pad-8--r"></em><h:outputText value="#{msg['login.message.failed']}" />
+                                    </span></div>
+                            </c:if>
+                            <h:form id="loginForm">
+
+                                <div class="form-group">
+                                    <label>#{msg['login.username']}</label>
+                                    <b:inputText tabindex="1" id="username" name="username" required="true"
+                                                 class="form-control"/>
+                                </div>
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col">
+                                            <label>#{msg['login.password']}</label>
+                                        </div>
+                                        <div class="col-auto">
+                                            <a class="text-muted" tabindex="4" href="./password/reset.xhtml">
+                                                #{msg['login.message.forgotten']}
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <b:inputSecret tabindex="2" id="password" class="form-control" name="password"
+                                                   required="true"/>
+                                </div>
+                                <div class="form-group text-center">
+                                    <button tabindex="3" class="btn btn-primary account-btn" id="login"
+                                            type="submit">#{msg['login.title']}
+                                    </button>
+                                </div>
+                                <div class="account-footer">
+                                    <p>#{msg['login.message.register']}</p>
+                                </div>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</h:body>
+</html>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+    <title>#{msg['error.page.401']} - #{msg['error.page.401.title']}</title>
+    <meta name="viewport" content="width=device-width"/>
+
+    <link rel="shortcut icon" type="image/x-icon" href="#{request.contextPath}/svg/favicon.ico"/>
+
+    <!-- Librarys -->
+    <link rel="stylesheet" href="css/bootstrap.css" media="all"/>
+    <!-- End Librarys -->
+
+    <!-- Custom CSS and PatternLab -->
+    <link rel="stylesheet" href="css/main.css" media="all"/>
+    <!-- End Custom CSS and PatternLab -->
+</h:head>
+<h:body class="error-page">
+    <f:view locale="#{localeController.currentLocale}">
+        <div class="main-wrapper">
+            <div class="error-box">
+                <h1>#{msg['error.page.401']}</h1>
+                <h3><em class="fa fa-warning"></em>#{msg['error.page.401.title']}</h3>
+                <p>#{msg['error.page.401.text']}</p>
+                <a href="dashboard.xhtml" class="btn btn-custom">#{msg['error.page.startpage']}</a>
+            </div>
+        </div>
+    </f:view>
+</h:body>
+</html>

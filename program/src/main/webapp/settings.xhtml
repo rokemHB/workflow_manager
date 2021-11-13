@@ -1,0 +1,262 @@
+<?xml version = "1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+      xmlns:kcb="http://kcb.mschaeff.de">
+
+<h:head>
+    <title>#{msg['facelet.label.title-settings']}</title>
+    <meta name="viewport" content="width=device-width"/>
+    <link rel="shortcut icon" type="image/x-icon" href="#{request.contextPath}/svg/favicon.ico"/>
+
+    <!-- Librarys -->
+    <link rel="stylesheet" href="css/bootstrap.css" media="all"/>
+    <link rel="stylesheet" href="css/dataTables.bootstrap4.min.css" media="all"/>
+    <link rel="stylesheet" href="css/select2.min.css" media="all"/>
+    <link rel="stylesheet" href="css/font-awesome.css" media="all"/>
+    <link rel="stylesheet" href="css/line-awesome.min.css" media="all"/>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/main.css" media="all"/>
+
+    <!-- Load early for Darkmode -->
+    <script type="text/javascript" src="js/libs/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="js/modules/darkmode_load.js"></script>
+
+    <!-- Scripts that need to be launched in the header -->
+    <script type="text/javascript" src="js/modules/validate.js"></script>
+    <script type="text/javascript" src="js/modules/selectBoxes.js"></script>
+</h:head>
+<h:body>
+    <!-- Custom Primfaces Theme -->
+    <link rel="stylesheet" href="css/components.css" media="all"/>
+    <f:view locale="#{localeController.currentLocale}">
+
+        <ui:insert>
+            <ui:include src="navigation.xhtml"/>
+        </ui:insert>
+
+        <div id="view" class="main-body #{navBarController.static}">
+            <div class="page-header l-mar-32--b">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h3 class="page-title">#{msg['facelet.label.navigation.settings']}</h3>
+                        <ul class="breadcrumb">
+                            <li class="breadcrumb-item"><a
+                                    href="dashboard.xhtml">#{msg['facelet.label.navigation.dashboard']}</a></li>
+                            <li class="breadcrumb-item active">#{msg['facelet.label.navigation.settings']}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12 col-md-6 col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="h3 card-title with-switch">
+                                <h:outputText value="#{msg['facelet.label.select-language']}"/>
+                            </div>
+                            <h:form>
+                                <h:selectOneMenu id="language_selector2" class="select"
+                                                 value="#{localeController.language}">
+                                    <p:ajax event="change" update="@this"/>
+                                    <f:selectItem itemLabel="#{msg['core.german']}" itemValue="de"/>
+                                    <f:selectItem itemLabel="#{msg['core.english']}" itemValue="en"/>
+                                </h:selectOneMenu>
+                                <script type="application/javascript">update();</script>
+                                <script type="application/javascript">select2();</script>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-12 col-md-6 col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="h3 card-title with-switch">
+                                <h:outputText value="#{msg['facelet.label.darkmode-switch']}"/>
+                            </div>
+                            <div class="row-float">
+                                <div class="l-mar-16--b">
+                                    <h:form style="margin:0px">
+                                        <h:commandLink class="btn btn--primary submit-btn"
+                                                       action="#{themeController.setDarkMode()}">
+                                            <h:outputText value="#{msg['facelet.label.dark']}"/>
+                                        </h:commandLink>
+                                    </h:form>
+                                </div>
+                                <div>
+                                    <h:form style="margin:0px">
+                                        <h:commandLink class="btn btn--primary submit-btn"
+                                                       action="#{themeController.setLightMode()}">
+                                            <h:outputText value="#{msg['facelet.label.light']}"/>
+                                        </h:commandLink>
+                                    </h:form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Validation Pattern Links -->
+                <kcb:roleConditional roles="ADMIN">
+                    <div class="col-sm-12 col-md-6 col-lg-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="h3 card-title with-switch">
+                                    <h:outputText value="#{msg['facelet.label.edit-validationpattern.title']}"/>
+                                </div>
+                                <h:form>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+
+                                            <a href="validationpatterns.xhtml" class="btn btn--primary submit-btn">
+                                                      <h:outputText value="#{msg['facelet.label.edit-validationpattern']}"/>
+                                            </a>
+                                            <br/>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <a href="advancedvalidationpatterns.xhtml" class="btn btn--primary submit-btn">
+                                                      <h:outputText value="#{msg['facelet.label.edit-advanced-validationpatter']}"/>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </kcb:roleConditional>
+
+                <kcb:roleConditional roles="ADMIN">
+                    <div class="col-sm-12 col-md-6 col-lg-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="h3 card-title with-switch">
+                                    <h:outputText value="#{msg['facelet.label.backup.title']}"/>
+                                </div>
+                                <h:form>
+                                    <p:commandButton ajax="false" styleClass="btn btn--primary submit-btn"  value="#{msg['facelet.label.backup.download']}"
+                                                    onclick="PrimeFaces.monitorDownload(start, stop);">
+                                        <p:fileDownload value="#{dbController.backupFile}"/>
+                                    </p:commandButton>
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </kcb:roleConditional>
+
+                <div class="col-sm-12 col-md-6 col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="h3 card-title with-switch">
+                                <h:outputText value="#{msg['facelet.label.reset.password.title']}"/></div>
+                            <h:form>
+
+                                <div class="submit-section">
+                                    <h:commandLink class="btn btn--primary submit-btn"
+                                                   action="#{passwordResetController.redirectToReset()}">
+                                        #{msg['facelet.label.reset']}
+                                    </h:commandLink>
+                                </div>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ADMIN CAN SET WHAT OLD ACTIVE JOBS ARE -->
+                <kcb:roleConditional roles="ADMIN">
+                    <div class="col-sm-12 col-md-6 col-lg-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="h3 card-title with-switch">
+                                    <h:outputText value="#{msg['facelet.label.settings.oldjobs']}"/>
+                                </div>
+                                <h:form>
+                                    <div class="row">
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label><h:outputText
+                                                        value="#{msg['facelet.label.settings.oldjobs-days']}"/></label>
+                                                <h:inputText
+                                                        value="#{globalConfigController.oldActiveJobDays}"
+                                                        class="form-control integer" type="text"
+                                                        converterMessage="#{msg['facelet.label.settings.digitsonly']}"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label><h:outputText
+                                                        value="#{msg['facelet.label.settings.oldjobs-hours']}"/></label>
+                                                <h:inputText
+                                                        value="#{globalConfigController.oldActiveJobHours}"
+                                                        class="form-control integer" type="text"
+                                                        converterMessage="#{msg['facelet.label.settings.digitsonly']}"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label><h:outputText
+                                                        value="#{msg['facelet.label.settings.oldjobs-minutes']}"/></label>
+                                                <h:inputText
+                                                        value="#{globalConfigController.oldActiveJobMinutes}"
+                                                        class="form-control integer" type="text"
+                                                        converterMessage="#{msg['facelet.label.settings.digitsonly']}"/>
+                                            </div>
+                                        </div>
+
+                                    </div> <!-- end row -->
+
+
+                                    <br/>
+                                    <div class="submit-section">
+                                        <h:commandLink class="btn btn--primary submit-btn"
+                                                       action="#{globalConfigController.updateOldActiveJob}">
+                                            <h:outputText value="#{msg['facelet.label.save']}"/>
+                                        </h:commandLink>
+                                    </div>
+
+
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </kcb:roleConditional>
+            </div>
+        </div>
+
+    </f:view>
+    <c:forEach items="#{localeController.getMessageQueue()}" var="message">
+        <div class="alert">
+            <div class="alert-icon">
+                <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                    <path fill="var(--color)" d="M10 3H14V14H10V3M10 21V17H14V21H10Z"/>
+                </svg>
+            </div>
+
+            <p class="alert-message">
+                <h:outputText value="#{message.getDetail()}"/>
+            </p>
+
+            <div class="spacer"></div>
+            <div class="alert-dismiss">
+                <h:form>
+                    <h:commandLink action="#{localeController.removeMessageQueue()}">close</h:commandLink>
+                </h:form>
+            </div>
+        </div>
+    </c:forEach>
+</h:body>
+
+<ui:insert>
+    <ui:include src="scripts.xhtml"/>
+</ui:insert>
+
+</html>

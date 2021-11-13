@@ -1,0 +1,469 @@
+<?xml version = "1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:l="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:kcb="http://kcb.mschaeff.de"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
+
+<h:head>
+    <title>#{msg['facelet.label.title-processchains']}</title>
+    <meta name="viewport" content="width=device-width"/>
+    <link rel="shortcut icon" type="image/x-icon" href="#{request.contextPath}/svg/favicon.ico"/>
+
+    <!-- Librarys -->
+    <link rel="stylesheet" href="css/bootstrap.css" media="all"/>
+    <link rel="stylesheet" href="css/dataTables.bootstrap4.min.css" media="all"/>
+    <link rel="stylesheet" href="css/select2.min.css" media="all"/>
+    <link rel="stylesheet" href="css/font-awesome.css" media="all"/>
+    <link rel="stylesheet" href="css/line-awesome.min.css" media="all"/>
+    <h:outputStylesheet name="primeicons/primeicons.css" library="primefaces" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/main.css" media="all"/>
+
+    <!-- Scripts that need to be launched in the header -->
+    <script type="text/javascript" src="js/modules/validate.js"></script>
+    <script type="text/javascript" src="js/modules/selectBoxes.js"></script>
+</h:head>
+<h:body>
+    <!-- Custom Primfaces Theme -->
+    <link rel="stylesheet" href="css/components.css" media="all"/>
+    <f:view locale="#{localeController.currentLocale}">
+        <ui:insert>
+            <ui:include src="navigation.xhtml"/>
+        </ui:insert>
+
+        <!--                CREATE BUTTON         -->
+        <div id="view" class="main-body #{navBarController.static}">
+            <div class="page-header l-mar-32--b">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h3 class="page-title">#{msg['facelet.label.navigation.processchains']}</h3>
+                        <ul class="breadcrumb">
+                            <li class="breadcrumb-item"><a
+                                    href="dashboard.xhtml">#{msg['facelet.label.navigation.dashboard']}</a></li>
+                            <li class="breadcrumb-item active">#{msg['facelet.label.navigation.processchains']}</li>
+                        </ul>
+                    </div>
+                    <kcb:roleConditional roles="PKP">
+                        <div class="col-auto float-right ml-auto">
+                            <a href="priorities.xhtml" class="btn btn--primary l-mar-16--r"><em class="fa fa-chevron-right l-pad-8--r"></em> <h:outputText
+                                    value="#{msg['facelet.label.navigation.priorities']}"/></a>
+                            <a href="#" class="btn add-btn btn--primary" data-toggle="modal"
+                               data-target="#add_processchain">
+                                <em class="fa fa-plus l-pad-8--r"></em> <h:outputText
+                                    value="#{msg['facelet.label.add-processchain']}"/></a>
+                        </div>
+                    </kcb:roleConditional>
+                </div>
+            </div>
+
+            <!--                AUSGABE ALS TABELLE         -->
+            <div class="row">
+                <div class="l-grid-12">
+                    <div class="row">
+                        <div class="l-grid-12">
+                            <div class="table-responsive">
+                                <table id="users" class="table table-striped custom-table datatable">
+                                    <thead>
+                                    <tr>
+                                        <th><h:outputText value="#{msg['facelet.label.name']}"/></th>
+                                        <th><h:outputText value="#{msg['facelet.label.processchain-incl-steps']}"/></th>
+                                        <th class="no-sort"></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <ui:repeat value="#{processchainsController.entities}" var="processchain">
+                                        <tr>
+                                            <td>#{processchain.name}</td>
+                                            <td>
+                                                <ui:repeat value="#{processchain.chain}" var="step" varStatus="status">
+                                                    #{step.name} <h:panelGroup rendered="#{!status.last}"><span class="f-w--900">&rarr;</span></h:panelGroup>
+                                                </ui:repeat>
+                                            </td>
+
+                                            <kcb:roleConditional roles="PKP">
+                                                <td class="text-right">
+                                                    <f:view id="chain_view">
+                                                        <div class="dropdown dropdown-action">
+                                                            <a href="#" class="action-icon dropdown-toggle"
+                                                               data-toggle="dropdown"
+                                                               aria-expanded="false"><em
+                                                                    class="material-icons">more_vert</em></a>
+                                                            <div class="dropdown-menu dropdown-menu-right">
+                                                                <h:form>
+                                                                <span data-toggle="modal"
+                                                                      data-target="#start_processchain">
+                                                                <p:commandLink
+                                                                        action="#{jobController.startChain(processchain)}"
+                                                                        ajax="true"
+                                                                        styleClass="dropdown-item">
+                                                                        <em class="fa fa-play m-r-5"></em> <h:outputText
+                                                                        value="#{msg['facelet.label.start']}"/>
+                                                                </p:commandLink>
+                                                                </span>
+                                                                </h:form>
+                                                                    <h:form>
+                                                                    <span data-toggle="modal"
+                                                                          data-target="#edit_processchain">
+                                                                <p:commandLink
+                                                                        action="#{processChainController.updateEntity(processchain)}"
+                                                                        ajax="true"
+                                                                        styleClass="dropdown-item">
+                                                                        <em class="fa fa-edit m-r-5"></em> <h:outputText
+                                                                        value="#{msg['facelet.label.edit']}"/>
+                                                                </p:commandLink>
+                                                                </span>
+                                                                    </h:form>
+                                                                <kcb:chainIsUnused chain="#{processchain}">
+                                                                    <h:form>
+                                                                    <span data-toggle="modal"
+                                                                          data-target="#delete_processchain">
+                                                                <p:commandLink
+                                                                        action="#{processChainController.updateEntity(processchain)}"
+                                                                        ajax="true"
+                                                                        styleClass="dropdown-item">
+                                                                        <em class="fa fa-trash-alt icon-more-padding m-r-5"></em> <h:outputText
+                                                                        value="#{msg['facelet.label.delete']}"/>
+                                                                </p:commandLink>
+                                                                </span>
+                                                                    </h:form>
+                                                                </kcb:chainIsUnused>
+                                                                <div class="special-upload">
+                                                                    <h:form enctype="multipart/form-data">
+                                                                        <a class="dropdown-item special-upload" ><em
+                                                                                class="fa fa-file-import m-r-5"></em><h:outputText
+                                                                                value="#{msg['facelet.label.import-param']}"/>
+                                                                            <span data-toggle="modal"
+                                                                                  data-target="#start_processchain">
+                                                                        <l:inputFile id="file"
+                                                                                     value="#{jobController.parameterImportFile}"
+                                                                                     mode="simple" skinSimple="true">
+                                                                        <f:ajax listener="#{jobController.upload(processchain)}"
+                                                                                render="modal-panel processChain_start_form parameter_loop"/>
+                                                                    </l:inputFile>
+                                                                </span>
+                                                                        </a>
+                                                                    </h:form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </f:view>
+                                                </td>
+                                            </kcb:roleConditional>
+                                        </tr>
+                                    </ui:repeat>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--                ADD PROCESSCHAIN DIALOG (POP UP)         -->
+            <div id="add_processchain" class="modal custom-modal fade" role="dialog" aria-modal="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><h:outputText value="#{msg['facelet.label.add-processchain']}"/>
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <f:view>
+                                <f:event type="preRenderView" listener="#{processchainsController.refresh()}"/>
+                                <h:form onsubmit="#{processChainController.reset()}">
+                                    <script type="application/javascript">update();</script>
+                                    <script type="application/javascript">select2();</script>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label><h:outputText value="#{msg['facelet.label.name']}"/><span
+                                                        class="text-danger">*</span></label>
+                                                <h:inputText id="name" value="#{processChainController.entity.name}"
+                                                             class="form-control process-chain-name" type="text"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label><h:outputText
+                                                        value="#{msg['facelet.label.processchain-steps']}"/></label>
+                                                <h:panelGroup>
+                                                    <p:pickList id="process_step_pick_list"
+                                                                converter="processStepConverter"
+                                                                responsive="true"
+                                                                value="#{processChainController.selectedProcessSteps}"
+                                                                var="processStep" itemLabel="#{processStep.name}"
+                                                                itemValue="#{processStep}">
+                                                        <p:ajax event="transfer" listener="#{pickListView.onTransfer}"/>
+                                                        <f:facet name="sourceCaption">Available</f:facet>
+                                                        <f:facet name="targetCaption">Starting</f:facet>
+                                                    </p:pickList>
+                                                </h:panelGroup>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="submit-section">
+                                        <h:commandLink class="btn btn--primary submit-btn"
+                                                       action="#{processChainController.create()}">
+                                            <h:outputText value="#{msg['facelet.label.create']}"/>
+                                        </h:commandLink>
+                                    </div>
+                                </h:form>
+                            </f:view>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--                           START PROCESSCHAIN (POP UP)                      -->
+            <f:view id="modal-panel">
+                <div id="start_processchain" class="modal custom-modal fade" role="dialog">
+                    <div class="modal-dialog modal-dialog-centered modal-xxl" role="document">
+                        <div class="modal-content" id="start_modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title"><h:outputText value="#{msg['facelet.label.create-job']}"/>
+                                </h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <h:form id="processChain_start_form">
+                                    <script type="application/javascript">update();</script>
+                                    <script type="application/javascript">select2();</script>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label><h:outputText value="#{msg['facelet.label.name']}"/><span
+                                                        class="text-danger">*</span></label>
+                                                <h:inputText id="editProcessChainNameForStart"
+                                                             value="#{jobController.entity.name}"
+                                                             class="form-control job-name" type="text"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label><h:outputText value="#{msg['facelet.label.priority']}"/></label>
+                                                <h:selectOneListbox class="select"
+                                                                    value="#{jobController.entity.priority}">
+                                                    <c:forEach items="#{prioritiesController.entities}" var="priority">
+                                                        <f:selectItem itemValue="#{priority}"
+                                                                      itemLabel="#{priority.name}"/>
+                                                    </c:forEach>
+                                                </h:selectOneListbox>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="l-grid-12">
+                                            <div class="table-responsive">
+                                                <table id="start_processchain-table"
+                                                       class="table table-striped custom-table datatable">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>#{msg['facelet.label.processchain']}</th>
+                                                        <th>#{msg['facelet.label.parameter']}</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    <c:forEach items="#{processChainController.entity.chain}" var="step"
+                                                               varStatus="stepStatus" id="parameter_loop">
+                                                        <tr>
+                                                            <td>#{step.name}</td>
+                                                            <td>
+                                                                <div class="row l-mar-8--t" id="parameter_container">
+                                                                    <c:forEach items="#{step.parameters}"
+                                                                               var="parameter"
+                                                                               id="parameter_repeater"
+                                                                               varStatus="parameterStatus">
+                                                                        <div class="col-md-2 l-mar-8--b">
+                                                                            <c:choose>
+                                                                                <c:when test="#{valueController.isCardinalValue(jobController.entity.procedures.get(stepStatus.index).values.get(parameterStatus.index))}">
+                                                                                    <h:inputText
+                                                                                            id="parameter-cardinal-value"
+                                                                                            a:placeholder="#{parameter.field}"
+                                                                                            value="#{jobController.entity.procedures.get(stepStatus.index).values.get(parameterStatus.index).valuePlusUnit}"
+                                                                                            class="form-control"
+                                                                                            type="text"/>
+                                                                                </c:when>
+                                                                                <c:otherwise>
+                                                                                    <h:inputText id="parameter-value"
+                                                                                                 a:placeholder="#{parameter.field}"
+                                                                                                 value="#{jobController.entity.procedures.get(stepStatus.index).values.get(parameterStatus.index).value}"
+                                                                                                 class="form-control"
+                                                                                                 type="text"/>
+                                                                                </c:otherwise>
+                                                                            </c:choose>
+                                                                        </div>
+                                                                    </c:forEach>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </c:forEach>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="submit-section">
+                                        <h:commandLink class="btn btn--primary submit-btn"
+                                                       action="#{jobController.create()}">
+                                            <h:outputText value="#{msg['facelet.label.start']}"/>
+                                        </h:commandLink>
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </f:view>
+
+            <!--                           EDIT PROCESSCHAIN (POP UP)                      -->
+            <div id="edit_processchain" class="modal custom-modal fade" role="dialog">
+                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><h:outputText value="#{msg['facelet.label.edit-processchain']}"/>
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <h:form id="processChain_edit_form">
+                                <script type="application/javascript">update();</script>
+                                <script type="application/javascript">select2();</script>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label><h:outputText value="#{msg['facelet.label.name']}"/><span
+                                                    class="text-danger">*</span></label>
+                                            <h:inputText id="editProcessChainName"
+                                                         value="#{processChainController.entity.name}"
+                                                         class="form-control process-chain-name" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label><h:outputText
+                                                    value="#{msg['facelet.label.processchain-steps']}"/><span
+                                                    class="text-danger">*</span></label>
+                                            <h:panelGroup>
+                                                <p:pickList id="process_step_edit_pick_list"
+                                                            converter="processStepConverter"
+                                                            responsive="true"
+                                                            disabled="#{!processChainController.canDelete(processChainController.entity)}"
+                                                            value="#{processChainController.selectedProcessSteps}"
+                                                            var="processStep" itemLabel="#{processStep.name}"
+                                                            itemValue="#{processStep}">
+                                                    <p:ajax event="transfer" listener="#{pickListView.onTransfer}"/>
+                                                    <f:facet name="sourceCaption">Available</f:facet>
+                                                    <f:facet name="targetCaption">Starting</f:facet>
+                                                </p:pickList>
+                                            </h:panelGroup>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="submit-section">
+                                    <h:commandLink class="btn btn--primary submit-btn"
+                                                   action="#{processChainController.update()}">
+                                        <h:outputText value="#{msg['facelet.label.save']}"/>
+                                    </h:commandLink>
+                                </div>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--                    DELETE PROCESSCHAIN (POP UP)                        -->
+            <div class="modal custom-modal fade" id="delete_processchain" role="dialog">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <div class="form-header">
+                                <h3><h:outputText value="#{msg['facelet.label.delete-processChain']}"/></h3>
+                                <p><h:outputText value="#{msg['facelet.label.delete-processChain-confirm']}"/></p>
+                            </div>
+                            <div class="modal-btn delete-action">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <h:form>
+                                            <div class="submit-section">
+                                                <h:commandLink class="btn btn-primary continue-btn"
+                                                               action="#{processChainController.delete()}">
+                                                    <h:outputText value="#{msg['facelet.label.delete']}"/>
+                                                </h:commandLink>
+                                            </div>
+                                        </h:form>
+                                    </div>
+                                    <div class="col-6">
+                                        <a href="javascript:void(0);" data-dismiss="modal"
+                                           class="btn btn-primary cancel-btn"><h:outputText
+                                                value="#{msg['facelet.label.cancel']}"/></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </f:view>
+    <c:forEach items="#{processChainController.getMessageQueue()}" var="message">
+        <div class="alert">
+            <div class="alert-icon">
+                <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                    <path fill="var(--color)" d="M10 3H14V14H10V3M10 21V17H14V21H10Z"/>
+                </svg>
+            </div>
+
+            <p class="alert-message">
+                <h:outputText value="#{message.getDetail()}"/>
+            </p>
+
+            <div class="spacer"></div>
+            <div class="alert-dismiss">
+                <h:form>
+                    <h:commandLink action="#{processChainController.removeMessageQueue()}">close</h:commandLink>
+                </h:form>
+            </div>
+        </div>
+    </c:forEach>
+</h:body>
+
+<!-- Bootstrap Core JS -->
+<script type="text/javascript" src="js/libs/popper.min.js"></script>
+<script type="text/javascript" src="js/libs/bootstrap.min.js"></script>
+
+<!-- Slimscroll JS -->
+<script type="text/javascript" src="js/libs/jquery.slimscroll.min.js"></script>
+
+<!-- Select2 JS -->
+<script type="text/javascript" src="js/libs/select2.min.js"></script>
+
+<!-- Datatable JS -->
+<script type="text/javascript" src="js/libs/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="js/libs/dataTables.bootstrap4.min.js"></script>
+
+<!-- Custom JS -->
+<script type="text/javascript" src="js/libs/app.js"></script>
+<script type="text/javascript" src="js/modules/navigation.js"></script>
+<script type="text/javascript" src="js/modules/selectBoxes.js"></script>
+<script type="text/javascript" src="js/modules/table.js"></script>
+
+</html>
+
+

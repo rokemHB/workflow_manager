@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<persistence version="2.0"
+             xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="
+        http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+
+    <persistence-unit name="prototypePU" transaction-type="JTA">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <jta-data-source>java:jboss/datasources/ExampleDS</jta-data-source>
+        <class>de.unibremen.swp2.kcb.model.User</class>
+        <class>de.unibremen.swp2.kcb.model.parameter.Parameter</class>
+        <class>de.unibremen.swp2.kcb.model.parameter.CardinalValue</class>
+        <class>de.unibremen.swp2.kcb.model.parameter.Value</class>
+        <class>de.unibremen.swp2.kcb.model.Assembly</class>
+        <class>de.unibremen.swp2.kcb.model.Carrier</class>
+        <class>de.unibremen.swp2.kcb.model.CarrierType</class>
+        <class>de.unibremen.swp2.kcb.model.GlobalConfig</class>
+        <class>de.unibremen.swp2.kcb.model.Job</class>
+        <class>de.unibremen.swp2.kcb.model.Priority</class>
+        <class>de.unibremen.swp2.kcb.model.Procedure</class>
+        <class>de.unibremen.swp2.kcb.model.ProcessChain</class>
+        <class>de.unibremen.swp2.kcb.model.ProcessStep</class>
+        <class>de.unibremen.swp2.kcb.model.Locations.Workstation</class>
+        <class>de.unibremen.swp2.kcb.model.Locations.Stock</class>
+        <class>de.unibremen.swp2.kcb.model.Locations.Transport</class>
+        <class>de.unibremen.swp2.kcb.model.StateMachine.State</class>
+        <class>de.unibremen.swp2.kcb.model.StateMachine.StateExec</class>
+        <class>de.unibremen.swp2.kcb.model.StateMachine.StateHistory</class>
+        <class>de.unibremen.swp2.kcb.model.StateMachine.StateMachine</class>
+        <class>de.unibremen.swp2.kcb.model.ResetToken</class>
+        <class>de.unibremen.swp2.kcb.model.ValidationPattern</class>
+        <properties>
+            <property name="hibernate.hbm2ddl.auto" value="create"/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+        </properties>
+    </persistence-unit>
+
+
+</persistence>

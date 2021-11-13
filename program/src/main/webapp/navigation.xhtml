@@ -1,0 +1,178 @@
+<?xml version = "1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:kcb="http://kcb.mschaeff.de" xmlns:f="http://xmlns.jcp.org/jsf/core"
+>
+
+<h:head>
+    <title>SWP2</title>
+    <meta name="viewport" content="width=device-width"/>
+    <link rel="shortcut icon" type="image/x-icon" href="#{request.contextPath}/svg/favicon.ico"/>
+
+    <!-- Librarys -->
+    <link rel="stylesheet" href="css/bootstrap.css" media="all"/>
+    <link rel="stylesheet" href="css/dataTables.bootstrap4.min.css" media="all"/>
+    <link rel="stylesheet" href="css/select2.min.css" media="all"/>
+    <link rel="stylesheet" href="css/font-awesome.css" media="all"/>
+    <link rel="stylesheet" href="css/line-awesome.min.css" media="all"/>
+X
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/main.css" media="all"/>
+</h:head>
+
+<h:body>
+    <f:view locale="#{localeController.currentLocale}">
+        <ui:composition>
+
+            <div class="header">
+                <kcb:authConditional>
+                    <div class="navigation--desktop__top">
+                        <div class="header__wrapper ">
+                            <a class="logo" style="text-decoration: none;" href="dashboard.xhtml"><span class="icon-cowboy logo__icon"></span>Karstens Cowboys</a>
+                            <h:form>
+                                <h:commandLink action="#{logoutController.submit}"><span
+                                        id="logout" class="menu__right"><em
+                                        class="fas fa-sign-out-alt fa-fw menu__icon"></em></span></h:commandLink>
+                            </h:form>
+                        </div>
+                    </div>
+                </kcb:authConditional>
+                <div id="sidebar" class="navigation--desktop__side #{navBarController.menuStatic}">
+                    <a class="menu-toggle">
+      <span class="menu__burger menu-toggle">
+        <span class="menu__burger__top"></span>
+        <span class="menu__burger__center"></span>
+        <span class="menu__burger__bottom"></span>
+      </span></a>
+                    <h:form>
+                        <h:commandLink action="#{logoutController.submit}"><span
+                                onclick="reset();" id="logout-mobile" class="menu__right-mobile"><em
+                                class="fas fa-sign-out-alt fa-fw menu__icon"></em></span></h:commandLink>
+                    </h:form>
+                    <h:form id="pin_form">
+                        <h:commandLink action="#{navBarController.toggleMenu}"><span
+                                class="icon-inclined-pin menu__pin"></span>
+                        </h:commandLink>
+                    </h:form>
+                    <h:form id="pin_form_mobile">
+                        <h:commandLink action="#{navBarController.toggleMenu}"><span
+                                class="icon-inclined-pin menu__pin menu__right-mobile"></span>
+                        </h:commandLink>
+                    </h:form>
+                    <a href=""><span class="menu__right-mobile"><em
+                            class="fas fa-sign-out-alt fa-fw menu__icon"></em></span></a>
+                    <div class="menu__wrapper ">
+                        <ul class="fa-ul">
+                            <kcb:authConditional>
+                                <li class="menu__links"><a href="dashboard.xhtml"><span class="fa-li"><em
+                                        class="icon-dashboard menu__icon"></em></span>#{msg['facelet.label.navigation.dashboard']}
+                                </a></li>
+                            </kcb:authConditional>
+                            <kcb:roleConditional roles="ADMIN">
+                                <li class="menu__links"><a href="users.xhtml"><span class="fa-li"><em
+                                        class="icon-user menu__icon"></em></span>#{msg['facelet.label.navigation.users']}
+                                </a></li>
+                            </kcb:roleConditional>
+                            <kcb:roleConditional roles="TECHNOLOGE, LOGISTIKER, TRANSPORT" operation="OR">
+                                <li class="menu__links"><a href="assemblies.xhtml"><span class="fa-li"><em
+                                        class="icon-medical-samples menu__icon"></em></span>#{msg['facelet.label.navigation.assembly']}
+                                </a></li>
+                            </kcb:roleConditional>
+                            <kcb:roleConditional roles="TECHNOLOGE, ADMIN, PKP" operation="OR">
+                                <li class="menu__links"><a href="workstations.xhtml"><span class="fa-li"><em
+                                        class="icon-laboratory-bench menu__icon"></em></span>#{msg['facelet.label.navigation.workstations']}
+                                </a></li>
+                            </kcb:roleConditional>
+                            <kcb:roleConditional roles="LOGISTIKER" operation="OR">
+                                <li class="menu__links"><a href="stocks.xhtml"><span class="fa-li"><em
+                                        class="icon-warehouse menu__icon"></em></span>#{msg['facelet.label.navigation.stocks']}
+                                </a></li>
+                            </kcb:roleConditional>
+                            <kcb:roleConditional roles="PKP" operation="OR">
+                                <li class="menu__links"><a href="statemachines.xhtml"><span class="fa-li"><em
+                                        class="icon-diagram menu__icon"></em></span>#{msg['facelet.label.navigation.statemachine']}
+                                </a></li>
+                            </kcb:roleConditional>
+                            <kcb:roleConditional roles="LOGISTIKER" operation="OR">
+                                <li class="menu__links"><a href="carriers.xhtml"><span class="fa-li"><em
+                                        class="icon-blood-sample fa-fw menu__icon"></em></span>#{msg['facelet.label.navigation.carrier']}
+                                </a></li>
+                            </kcb:roleConditional>
+                            <kcb:roleConditional roles="PKP" operation="OR">
+                                <li class="menu__links"><a href="processsteps.xhtml"><span class="fa-li"><em
+                                        class="icon-chip menu__icon"></em></span>#{msg['facelet.label.navigation.processsteps']}
+                                </a></li>
+                            </kcb:roleConditional>
+                            <kcb:roleConditional roles="PKP" operation="OR">
+                                <li class="menu__links"><a href="processchains.xhtml"><span class="fa-li"><em
+                                        class="icon-deep-learning menu__icon"></em></span>#{msg['facelet.label.navigation.processchains']}
+                                </a></li>
+                            </kcb:roleConditional>
+                            <kcb:roleConditional roles="PKP, LOGISTIKER" operation="OR">
+                                <li class="menu__links"><a href="jobs.xhtml"><span class="fa-li"><em
+                                        class="icon-jobs menu__icon"></em></span>#{msg['facelet.label.navigation.jobs']}
+                                </a></li>
+                            </kcb:roleConditional>
+                            <kcb:roleConditional roles="TRANSPORT" operation="OR">
+                                <li class="menu__links"><a href="transports.xhtml"><span class="fa-li"><em
+                                        class="icon-carrier menu__icon"></em></span>#{msg['facelet.label.navigation.transport']}
+                                </a></li>
+                            </kcb:roleConditional>
+                            <li class="menu__links"><a href="help.xhtml"><span class="fa-li"><em
+                                    class="icon-question menu__icon"></em></span>#{msg['facelet.label.navigation.help']}
+                            </a></li>
+                            <li class="menu__links  menu__links-mobile"><a href="settings.xhtml"><span class="fa-li"><em
+                                    class="fas fa-cog fa-fw menu__icon"></em></span>#{msg['facelet.label.navigation.settings']}
+                            </a></li>
+                        </ul>
+                    </div>
+                    <kcb:authConditional>
+                        <div class="menu__wrapper-bottom">
+                            <ul class="fa-ul">
+                                <li class="menu__links"><a href="settings.xhtml"><span class="fa-li"><em
+                                        class="fas fa-cog fa-fw menu__icon"></em></span>#{msg['facelet.label.navigation.settings']}
+                                </a></li>
+                            </ul>
+                        </div>
+                    </kcb:authConditional>
+                </div>
+            </div>
+        </ui:composition>
+    </f:view>
+</h:body>
+
+<!-- jQuery -->
+<script type="text/javascript" src="js/libs/jquery-3.3.1.min.js"></script>
+
+<!-- Bootstrap Core JS -->
+<script type="text/javascript" src="js/libs/popper.min.js"></script>
+<script type="text/javascript" src="js/libs/bootstrap.min.js"></script>
+
+<!-- Script pour bootstrap -->
+<script type="text/javascript"
+        src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+
+<!-- Slimscroll JS -->
+<script type="text/javascript" src="js/libs/jquery.slimscroll.min.js"></script>
+
+<!-- Select2 JS -->
+<script type="text/javascript" src="js/libs/select2.min.js"></script>
+
+<!-- Datetimepicker JS -->
+<script type="text/javascript" src="js/libs/moment.min.js"></script>
+<script type="text/javascript" src="js/libs/bootstrap-datetimepicker.min.js"></script>
+
+<!-- Datatable JS -->
+<script type="text/javascript" src="js/libs/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="js/libs/dataTables.bootstrap4.min.js"></script>
+
+<!-- Custom JS -->
+<script type="text/javascript" src="js/libs/app.js"></script>
+<script src="js/modules/navigation.js" type="text/javascript"></script>
+<script src="js/modules/table.js" type="text/javascript"></script>
+
+</html>

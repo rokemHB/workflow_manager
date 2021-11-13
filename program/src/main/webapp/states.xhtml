@@ -1,0 +1,285 @@
+<?xml version = "1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:kcb="http://kcb.mschaeff.de"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+<h:head>
+    <title>#{msg['facelet.label.title-states']}</title>
+    <meta name="viewport" content="width=device-width"/>
+    <link rel="shortcut icon" type="image/x-icon" href="#{request.contextPath}/svg/favicon.ico"/>
+
+    <!-- Librarys -->
+    <link rel="stylesheet" href="css/bootstrap.css" media="all"/>
+    <link rel="stylesheet" href="css/dataTables.bootstrap4.min.css" media="all"/>
+    <link rel="stylesheet" href="css/select2.min.css" media="all"/>
+    <link rel="stylesheet" href="css/font-awesome.css" media="all"/>
+    <link rel="stylesheet" href="css/line-awesome.min.css" media="all"/>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/main.css" media="all"/>
+
+    <!-- Load early for Darkmode -->
+    <script type="text/javascript" src="js/libs/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="js/modules/darkmode_load.js"></script>
+
+    <!-- Scripts that need to be launched in the header -->
+    <script type="text/javascript" src="js/modules/validate.js"></script>
+    <script type="text/javascript" src="js/modules/selectBoxes.js"></script>
+</h:head>
+<h:body>
+    <!-- Custom Primfaces Theme -->
+    <link rel="stylesheet" href="css/components.css" media="all"/>
+    <f:view locale="#{localeController.currentLocale}">
+        <ui:insert>
+            <ui:include src="navigation.xhtml"/>
+        </ui:insert>
+
+        <!--                CREATE BUTTON         -->
+        <div id="view" class="main-body #{navBarController.static}">
+            <div class="page-header l-mar-32--b">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h3 class="page-title">#{msg['facelet.label.navigation.states']}</h3>
+                        <ul class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="dashboard.xhtml">#{msg['facelet.label.navigation.dashboard']}</a></li>
+                            <li class="breadcrumb-item"><a href="statemachines.xhtml">#{msg['facelet.label.navigation.statemachine']}</a></li>
+                            <li class="breadcrumb-item active">#{msg['facelet.label.navigation.states']}</li>
+                        </ul>
+                    </div>
+                    <div class="col-auto float-right ml-auto">
+                        <a href="#" class="btn add-btn btn--primary" data-toggle="modal" data-target="#add_state">
+                            <em class="fa fa-plus l-pad-8--r"></em> <h:outputText value="#{msg['facelet.label.add-state']}"/></a>
+                    </div>
+                </div>
+            </div>
+
+            <!--                AUSGABE ALS TABELLE         -->
+            <div class="row">
+                <div class="l-grid-12">
+                    <div class="row">
+                        <div class="l-grid-12">
+                            <div class="table-responsive">
+                                <table id="users" class="table table-striped custom-table datatable">
+                                    <thead>
+                                    <tr>
+                                        <th><h:outputText value="#{msg['facelet.label.name']}"/></th>
+                                        <th><h:outputText value="#{msg['facelet.label.state-blocking']}"/></th>
+                                        <th class="no-sort"></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <ui:repeat value="#{statesController.entities}" var="state">
+                                        <tr>
+                                            <td>#{state.name}</td>
+                                            <td>
+                                                <h:panelGroup rendered="#{state.blocking}">
+                                                    <span class="badge bg-inverse-danger">#{msg['facelet.label.state-blocking']}</span>
+                                                </h:panelGroup>
+                                                <h:panelGroup rendered="#{state.blocking == false}">
+                                                    <span class="badge bg-inverse-success">#{msg['facelet.label.state-non-blocking']}</span>
+                                                </h:panelGroup>
+                                            </td>
+                                            <td class="text-right">
+                                                <h:form>
+                                                    <kcb:isNotTransportState state="#{state}">
+                                                    <div class="dropdown dropdown-action">
+                                                        <a href="#" class="action-icon dropdown-toggle"
+                                                           data-toggle="dropdown"
+                                                           aria-expanded="false"><em
+                                                                class="material-icons">more_vert</em></a>
+                                                        <div class="dropdown-menu dropdown-menu-right">
+                                                            <span data-toggle="modal" data-target="#edit_state">
+                                                            <p:commandLink
+                                                                    action="#{stateController.updateEntity(state)}"
+                                                                    ajax="true"
+                                                                    styleClass="dropdown-item">
+                                                                    <em class="fa fa-edit m-r-5"></em> <h:outputText
+                                                                    value="#{msg['facelet.label.edit']}"/>
+                                                            </p:commandLink>
+                                                            </span>
+                                                            <span data-toggle="modal" data-target="#delete_state">
+                                                            <p:commandLink rendered="#{stateController.canDelete(state)}"
+                                                                    action="#{stateController.updateEntity(state)}"
+                                                                    ajax="true"
+                                                                    styleClass="dropdown-item">
+                                                                    <em class="fa fa-trash-alt icon-more-padding m-r-5"></em> <h:outputText
+                                                                    value="#{msg['facelet.label.delete']}"/>
+                                                            </p:commandLink>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    </kcb:isNotTransportState>
+                                                </h:form>
+                                            </td>
+                                        </tr>
+                                    </ui:repeat>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--                ADD STATE DIALOG (POP UP)         -->
+            <div id="add_state" class="modal custom-modal fade" role="dialog" aria-modal="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><h:outputText value="#{msg['facelet.label.add-state']}"/></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <f:view>
+                                <f:event type="preRenderView" listener="#{statesController.refresh()}"/>
+                                <h:form onsubmit="#{stateController.reset()}">
+                                    <script type="application/javascript">update();</script>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label><h:outputText value="#{msg['facelet.label.name']}"/><span
+                                                        class="text-danger">*</span></label>
+                                                <h:inputText id="name" value="#{stateController.entity.name}"
+                                                             class="form-control state-name" type="text"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6 m-t-20">
+                                            <div class="form-group">
+                                                <h:outputText styleClass="kcb-form-label"
+                                                              value="#{msg['facelet.label.state-blocking']}"/>
+                                                <p:selectBooleanButton id="select-broken-add"
+                                                                       styleClass="kcb-boolean-select"
+                                                                       value="#{stateController.entity.blocking}"
+                                                                       onLabel="#{localeController.formatString('core.yes')}"
+                                                                       offLabel="#{localeController.formatString('core.no')}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="submit-section">
+                                        <h:commandLink class="btn btn--primary submit-btn"
+                                                       action="#{stateController.create()}">
+                                            <h:outputText value="#{msg['facelet.label.create']}"/>
+                                        </h:commandLink>
+                                    </div>
+                                </h:form>
+                            </f:view>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--                           EDIT STATE (POP UP)                      -->
+            <div id="edit_state" class="modal custom-modal fade" role="dialog">
+                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><h:outputText value="#{msg['facelet.label.edit-state']}"/></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <h:form id="state_edit_form">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label><h:outputText value="#{msg['facelet.label.name']}"/><span
+                                                    class="text-danger">*</span></label>
+                                            <h:inputText id="editStatename" value="#{stateController.entity.name}"
+                                                         class="form-control valid state-name" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 m-t-20">
+                                        <div class="form-group">
+                                            <h:outputText styleClass="kcb-form-label"
+                                                          value="#{msg['facelet.label.state-blocking']}"/>
+                                            <p:selectBooleanButton id="select-broken" disabled="#{!stateController.canDelete(state)}"
+                                                                   styleClass="kcb-boolean-select"
+                                                                   value="#{stateController.entity.blocking}"
+                                                                   onLabel="#{localeController.formatString('core.yes')}"
+                                                                   offLabel="#{localeController.formatString('core.no')}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="submit-section">
+                                    <h:commandLink class="btn btn--primary submit-btn"
+                                                   action="#{stateController.update()}">
+                                        <h:outputText value="#{msg['facelet.label.save']}"/>
+                                    </h:commandLink>
+                                </div>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--                    DELETE STATE (POP UP)                        -->
+            <div class="modal custom-modal fade" id="delete_state" role="dialog">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <div class="form-header">
+                                <h3><h:outputText value="#{msg['facelet.label.delete-state']}"/></h3>
+                                <p><h:outputText value="#{msg['facelet.label.delete-state-confirm']}"/></p>
+                            </div>
+                            <div class="modal-btn delete-action">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <h:form>
+                                            <div class="submit-section">
+                                                <h:commandLink class="btn btn-primary continue-btn"
+                                                               action="#{stateController.delete()}">
+                                                    <h:outputText value="#{msg['facelet.label.delete']}"/>
+                                                </h:commandLink>
+                                            </div>
+                                        </h:form>
+                                    </div>
+                                    <div class="col-6">
+                                        <a href="javascript:void(0);" data-dismiss="modal"
+                                           class="btn btn-primary cancel-btn"><h:outputText
+                                                value="#{msg['facelet.label.cancel']}"/></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </f:view>
+    <c:forEach items="#{stateController.getMessageQueue()}" var="message">
+        <div class="alert">
+            <div class="alert-icon">
+                <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                    <path fill="var(--color)" d="M10 3H14V14H10V3M10 21V17H14V21H10Z"/>
+                </svg>
+            </div>
+
+            <p class="alert-message">
+                <h:outputText value="#{message.getDetail()}"/>
+            </p>
+
+            <div class="spacer"></div>
+            <div class="alert-dismiss">
+                <h:form>
+                    <h:commandLink action="#{stateController.removeMessageQueue()}">close</h:commandLink>
+                </h:form>
+            </div>
+        </div>
+    </c:forEach>
+</h:body>
+<ui:insert>
+    <ui:include src="scripts.xhtml"/>
+</ui:insert>
+</html>
+
+

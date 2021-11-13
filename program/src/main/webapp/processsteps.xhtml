@@ -1,0 +1,674 @@
+<?xml version = "1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui" xmlns:kcb="http://kcb.mschaeff.de" xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+<h:head>
+    <title>#{msg['facelet.label.title-processsteps']}</title>
+    <meta name="viewport" content="width=device-width"/>
+    <link rel="shortcut icon" type="image/x-icon" href="#{request.contextPath}/svg/favicon.ico"/>
+
+    <!-- Librarys -->
+    <link rel="stylesheet" href="css/bootstrap.css" media="all"/>
+    <link rel="stylesheet" href="css/dataTables.bootstrap4.min.css" media="all"/>
+    <link rel="stylesheet" href="css/select2.min.css" media="all"/>
+    <link rel="stylesheet" href="css/font-awesome.css" media="all"/>
+    <link rel="stylesheet" href="css/line-awesome.min.css" media="all"/>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/main.css" media="all"/>
+
+    <!-- Load early for Darkmode -->
+    <script type="text/javascript" src="js/libs/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="js/modules/darkmode_load.js"></script>
+
+
+    <!-- Scripts that need to be launched in the header -->
+    <script type="text/javascript" src="js/modules/validate.js"></script>
+    <script type="text/javascript" src="js/modules/selectBoxes.js"></script>
+</h:head>
+<h:body>
+    <!-- Custom Primfaces Theme -->
+    <link rel="stylesheet" href="css/components.css" media="all"/>
+    <f:view locale="#{localeController.currentLocale}">
+        <ui:insert>
+            <ui:include src="navigation.xhtml"/>
+        </ui:insert>
+
+        <!--                CREATE BUTTON         -->
+        <div id="view" class="main-body #{navBarController.static}">
+            <div class="page-header l-mar-32--b">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h3 class="page-title">#{msg['facelet.label.navigation.processsteps']}</h3>
+                        <ul class="breadcrumb">
+                            <li class="breadcrumb-item"><a
+                                    href="dashboard.xhtml">#{msg['facelet.label.navigation.dashboard']}</a></li>
+                            <li class="breadcrumb-item"><a
+                                    href="processchains.xhtml">#{msg['facelet.label.navigation.processchains']}</a></li>
+                            <li class="breadcrumb-item active">#{msg['facelet.label.navigation.processsteps']}</li>
+                        </ul>
+                    </div>
+                    <kcb:roleConditional roles="PKP">
+                        <div class="col-auto float-right ml-auto">
+                            <a href="parameters.xhtml" class="btn btn--primary l-mar-16--r"><em
+                                    class="fa fa-chevron-right l-pad-8--r"></em> <h:outputText
+                                    value="#{msg['facelet.label.parameter']}"/></a>
+                            <a href="#" class="btn add-btn btn--primary" data-toggle="modal"
+                               data-target="#add_processstep">
+                                <em class="fa fa-plus l-pad-8--r"></em> <h:outputText
+                                    value="#{msg['facelet.label.add-processstep']}"/></a>
+                        </div>
+                    </kcb:roleConditional>
+                </div>
+            </div>
+
+            <!--                AUSGABE ALS TABELLE         -->
+            <div class="row">
+                <div class="l-grid-12">
+                    <div class="row">
+                        <div class="l-grid-12">
+                            <div class="table-responsive">
+                                <table id="users" class="table table-striped custom-table datatable">
+                                    <thead>
+                                    <tr>
+                                        <th><h:outputText value="#{msg['facelet.label.name']}"/></th>
+                                        <th><h:outputText value="#{msg['facelet.label.statemachine']}"/></th>
+                                        <th><h:outputText value="#{msg['facelet.label.workstation']}"/></th>
+                                        <th><h:outputText value="#{msg['facelet.label.carrierType.preparation']}"/></th>
+                                        <th><h:outputText value="#{msg['facelet.label.carrierType.output']}"/></th>
+                                        <th><h:outputText value="#{msg['facelet.label.attributes']}"/></th>
+                                        <th><h:outputText value="#{msg['facelet.label.processstep-duration']}"/></th>
+                                        <th><h:outputText value="#{msg['facelet.label.status']}"/></th>
+                                        <th class="no-sort"></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <ui:repeat value="#{processStepsController.entities}" var="processstep">
+                                        <tr>
+                                            <td>#{processstep.name}</td>
+                                            <td>#{processstep.stateMachine.name}</td>
+                                            <td>#{processstep.workstation.name}</td>
+                                            <td>#{processstep.preparation.name}</td>
+                                            <td>#{processstep.output.name}</td>
+                                            <td>
+                                                <h:panelGroup rendered="#{processstep.creates}">
+                                                    <span class="badge bg-inverse-success">#{msg['facelet.label.creates']}</span>
+                                                </h:panelGroup>
+                                                <h:panelGroup rendered="#{processstep.deletes}">
+                                                    <span class="badge bg-inverse-danger">#{msg['facelet.label.destroys']}</span>
+                                                </h:panelGroup>
+                                                <h:panelGroup rendered="#{processstep.modifies}">
+                                                    <span class="badge bg-inverse-info">#{msg['facelet.label.modifies']}</span>
+                                                </h:panelGroup>
+                                            </td>
+                                            <td>#{processstep.estDuration}</td>
+                                            <td>
+                                                <h:panelGroup rendered="#{processstep.workstation.broken}">
+                                                    <span class="badge bg-inverse-danger">#{msg['facelet.label.broken']}</span>
+                                                </h:panelGroup>
+                                                <h:panelGroup rendered="#{processstep.workstation.broken == false}">
+                                                    <span class="badge bg-inverse-success">#{msg['facelet.label.not-broken']}</span>
+                                                </h:panelGroup>
+                                            </td>
+                                            <kcb:roleConditional roles="PKP">
+                                                <td class="text-right">
+                                                    <h:form>
+                                                        <div class="dropdown dropdown-action">
+                                                            <a href="#" class="action-icon dropdown-toggle"
+                                                               data-toggle="dropdown"
+                                                               aria-expanded="false"><em
+                                                                    class="material-icons">more_vert</em></a>
+                                                            <div class="dropdown-menu dropdown-menu-right">
+                                                                <span data-toggle="modal"
+                                                                      data-target="#view_processstep">
+                                                                        <p:commandLink
+                                                                                action="#{processStepController.updateEntity(processstep)}"
+                                                                                ajax="true"
+                                                                                styleClass="dropdown-item">
+                                                                                <em class="fa fa-eye m-r-5"></em> <h:outputText
+                                                                                value="#{msg['facelet.label.view']}"/>
+                                                                        </p:commandLink>
+                                                                        </span>
+                                                                <span data-toggle="modal"
+                                                                      data-target="#edit_processstep">
+                                                                    <p:commandLink
+                                                                            action="#{processStepController.updateEntity(processstep)}"
+                                                                            ajax="true"
+                                                                            styleClass="dropdown-item">
+                                                                        <em class="fa fa-edit m-r-5"></em>
+                                                                        <h:outputText
+                                                                                value="#{msg['facelet.label.edit']}"/>
+                                                                    </p:commandLink>
+                                                                </span>
+                                                                <kcb:stepIsUnstarted step="#{processstep}">
+                                                                    <span data-toggle="modal"
+                                                                          data-target="#delete_processStep">
+                                                                    <p:commandLink
+                                                                            action="#{processStepController.updateEntity(processstep)}"
+                                                                            ajax="true"
+                                                                            styleClass="dropdown-item">
+                                                                            <em class="fa fa-trash-alt icon-more-padding m-r-5"></em>
+                                                                        <h:outputText
+                                                                                value="#{msg['facelet.label.delete']}"/>
+                                                                    </p:commandLink>
+                                                                </span>
+                                                                </kcb:stepIsUnstarted>
+                                                            </div>
+                                                        </div>
+                                                    </h:form>
+                                                </td>
+                                            </kcb:roleConditional>
+                                        </tr>
+                                    </ui:repeat>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--                ADD PROCESSSTEP DIALOG (POP UP)         -->
+            <div id="add_processstep" class="modal custom-modal fade" role="dialog" aria-modal="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><h:outputText value="#{msg['facelet.label.add-processstep']}"/></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <f:view>
+                                <f:event type="preRenderView" listener="#{processStepsController.refresh()}"/>
+                                <h:form onsubmit="#{processStepController.reset()}">
+                                    <script type="application/javascript">update();</script>
+                                    <script type="application/javascript">select2();</script>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label><h:outputText value="#{msg['facelet.label.name']}"/><span
+                                                        class="text-danger">*</span></label>
+                                                <h:inputText id="name" value="#{processStepController.entity.name}"
+                                                             class="form-control process-step-name" type="text"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label><h:outputText
+                                                        value="#{msg['facelet.label.processstep-duration']}"/><span
+                                                        class="text-danger">*</span></label>
+                                                <h:inputText id="duration"
+                                                             value="#{processStepController.entity.estDuration}"
+                                                             class="form-control integer" type="text"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label><h:outputText value="#{msg['facelet.label.statemachine']}"/><span
+                                                        class="text-danger">*</span></label>
+                                                <h:selectOneListbox class="select"
+                                                                    value="#{processStepController.entity.stateMachine}">
+                                                    <f:selectItems value="#{stateMachinesController.entities}" var="y"
+                                                                   itemLabel="#{y.name}" itemValue="#{y}"/>
+                                                </h:selectOneListbox>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label><h:outputText
+                                                        value="#{msg['facelet.label.carrierType.preparation']}"/></label>
+                                                <h:selectOneListbox value="#{processStepController.entity.preparation}"
+                                                                    class="select">
+                                                    <f:selectItems value="#{carrierTypesController.entities}" var="ct"
+                                                                   itemLabel="#{ct.name}" itemValue="#{ct}"/>
+                                                </h:selectOneListbox>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label><h:outputText
+                                                        value="#{msg['facelet.label.carrierType.output']}"/></label>
+                                                <h:selectOneListbox value="#{processStepController.entity.output}"
+                                                                    class="select">
+                                                    <f:selectItems value="#{carrierTypesController.entities}" var="ct"
+                                                                   itemLabel="#{ct.name}" itemValue="#{ct}"/>
+                                                </h:selectOneListbox>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label><h:outputText
+                                                        value="#{msg['facelet.label.workstation']}"/><span
+                                                        class="text-danger">*</span></label>
+                                                <h:selectOneListbox value="#{processStepController.entity.workstation}"
+                                                                    class="select"
+                                                                    converter="workstationConverter">
+                                                    <f:selectItems value="#{workstationsController.entities}" var="ws"
+                                                                   itemLabel="#{ws.name}" itemValue="#{ws}"/>
+                                                </h:selectOneListbox>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label><h:outputText value="#{msg['facelet.label.parameter']}"/><span
+                                                        class="text-danger">*</span></label>
+                                                <h:selectManyListbox value="#{processStepController.entity.parameters}"
+                                                                     class="select"
+                                                                     collectionType="java.util.ArrayList">
+                                                    <f:selectItems value="#{parametersController.entities}" var="p"
+                                                                   itemLabel="#{p.field}" itemValue="#{p}"/>
+                                                </h:selectManyListbox>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <h:outputText styleClass="kcb-form-label"
+                                                              value="#{msg['facelet.label.modifies']}"/>
+                                                <p:selectBooleanButton id="select-modifies"
+                                                                       styleClass="kcb-boolean-select"
+                                                                       value="#{processStepController.entity.modifies}"
+                                                                       onLabel="#{localeController.formatString('core.yes')}"
+                                                                       offLabel="#{localeController.formatString('core.no')}"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <h:outputText styleClass="kcb-form-label"
+                                                              value="#{msg['facelet.label.creates']}"/>
+                                                <p:selectBooleanButton id="select-creates"
+                                                                       styleClass="kcb-boolean-select"
+                                                                       value="#{processStepController.entity.creates}"
+                                                                       onLabel="#{localeController.formatString('core.yes')}"
+                                                                       offLabel="#{localeController.formatString('core.no')}"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <h:outputText styleClass="kcb-form-label"
+                                                              value="#{msg['facelet.label.destroys']}"/>
+                                                <p:selectBooleanButton id="select-destroys"
+                                                                       styleClass="kcb-boolean-select"
+                                                                       value="#{processStepController.entity.deletes}"
+                                                                       onLabel="#{localeController.formatString('core.yes')}"
+                                                                       offLabel="#{localeController.formatString('core.no')}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="submit-section">
+                                        <h:commandLink class="btn btn--primary submit-btn"
+                                                       action="#{processStepController.create()}">
+                                            <h:outputText value="#{msg['facelet.label.create']}"/>
+                                        </h:commandLink>
+                                    </div>
+                                </h:form>
+                            </f:view>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--                           VIEW PROCESSSTEP (POP UP)                      -->
+            <div id="view_processstep" class="modal custom-modal fade" role="dialog">
+                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><h:outputText value="#{msg['facelet.label.edit-processstep']}"/>
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <h:form id="processStep_view_form">
+                                <script type="application/javascript">update();</script>
+                                <script type="application/javascript">select2();</script>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label><h:outputText value="#{msg['facelet.label.name']}"/><span
+                                                    class="text-danger">*</span></label>
+                                            <h:inputText id="viewProcessStepname"
+                                                         value="#{processStepController.entity.name}"
+                                                         class="form-control process-step-name" type="text" disabled="true"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label><h:outputText
+                                                    value="#{msg['facelet.label.processstep-duration']}"/><span
+                                                    class="text-danger">*</span></label>
+                                            <h:inputText id="viewProcessStepDuration"
+                                                         value="#{processStepController.entity.estDuration}"
+                                                         class="form-control integer" type="text" disabled="true"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label><h:outputText
+                                                    value="#{msg['facelet.label.statemachine']}"/><span
+                                                    class="text-danger">*</span></label>
+                                            <h:selectOneListbox class="select" disabled="true"
+                                                                value="#{processStepController.entity.stateMachine}">
+                                                <f:selectItems value="#{stateMachinesController.entities}" var="y"
+                                                               itemLabel="#{y.name}" itemValue="#{y}"/>
+                                            </h:selectOneListbox>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label><h:outputText
+                                                    value="#{msg['facelet.label.carrierType.preparation']}"/></label>
+                                            <h:selectOneListbox class="select" disabled="true"
+                                                                value="#{processStepController.entity.preparation}">
+                                                <f:selectItems value="#{carrierTypesController.entities}" var="ct"
+                                                               itemLabel="#{ct.name}" itemValue="#{ct}"/>
+                                            </h:selectOneListbox>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label><h:outputText
+                                                    value="#{msg['facelet.label.carrierType.output']}"/></label>
+                                            <h:selectOneListbox class="select" disabled="true"
+                                                                value="#{processStepController.entity.output}">
+                                                <f:selectItems value="#{carrierTypesController.entities}" var="ct"
+                                                               itemLabel="#{ct.name}" itemValue="#{ct}"/>
+                                            </h:selectOneListbox>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label><h:outputText
+                                                    value="#{msg['facelet.label.workstation']}"/><span
+                                                    class="text-danger">*</span></label>
+                                            <h:selectOneListbox class="select" disabled="true"
+                                                                value="#{processStepController.entity.workstation}"
+                                                                converter="workstationConverter">
+                                                <f:selectItems value="#{workstationsController.entities}" var="ws"
+                                                               itemLabel="#{ws.name}" itemValue="#{ws}"/>
+                                            </h:selectOneListbox>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label><h:outputText value="#{msg['facelet.label.parameter']}"/><span
+                                                    class="text-danger">*</span></label>
+                                            <h:selectManyListbox class="select" disabled="true"
+                                                                 value="#{processStepController.entity.parameters}"
+                                                                 collectionType="java.util.ArrayList"
+                                                                 converter="parameterConverter">
+                                                <c:forEach items="#{parametersController.entities}" var="parameter">
+                                                    <f:selectItem itemValue="#{parameter}"
+                                                                  itemLabel="#{parameter.field}"/>
+                                                </c:forEach>
+                                            </h:selectManyListbox>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <h:outputText styleClass="kcb-form-label"
+                                                          value="#{msg['facelet.label.modifies']}"/>
+                                            <p:selectBooleanButton id="view-modifies" disabled="true"
+                                                                   styleClass="kcb-boolean-select"
+                                                                   value="#{processStepController.entity.modifies}"
+                                                                   onLabel="#{localeController.formatString('core.yes')}"
+                                                                   offLabel="#{localeController.formatString('core.no')}"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <h:outputText styleClass="kcb-form-label"
+                                                          value="#{msg['facelet.label.creates']}"/>
+                                            <p:selectBooleanButton id="view-creates" disabled="true"
+                                                                   styleClass="kcb-boolean-select"
+                                                                   value="#{processStepController.entity.creates}"
+                                                                   onLabel="#{localeController.formatString('core.yes')}"
+                                                                   offLabel="#{localeController.formatString('core.no')}"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <h:outputText styleClass="kcb-form-label"
+                                                          value="#{msg['facelet.label.destroys']}"/>
+                                            <p:selectBooleanButton id="view-destroys" disabled="true"
+                                                                   styleClass="kcb-boolean-select"
+                                                                   value="#{processStepController.entity.deletes}"
+                                                                   onLabel="#{localeController.formatString('core.yes')}"
+                                                                   offLabel="#{localeController.formatString('core.no')}"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--                           EDIT PROCESSSTEP (POP UP)                      -->
+            <div id="edit_processstep" class="modal custom-modal fade" role="dialog">
+                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><h:outputText value="#{msg['facelet.label.edit-processstep']}"/>
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <h:form id="processStep_edit_form">
+                                <script type="application/javascript">update();</script>
+                                <script type="application/javascript">select2();</script>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label><h:outputText value="#{msg['facelet.label.name']}"/><span
+                                                    class="text-danger">*</span></label>
+                                            <h:inputText id="editProcessStepname"
+                                                         value="#{processStepController.entity.name}"
+                                                         class="form-control valid process-step-name" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label><h:outputText
+                                                    value="#{msg['facelet.label.processstep-duration']}"/><span
+                                                    class="text-danger">*</span></label>
+                                            <h:inputText id="editProcessStepDuration"
+                                                         disabled="#{!processStepController.canDelete(processStepController.entity)}"
+                                                         value="#{processStepController.entity.estDuration}"
+                                                         class="form-control valid integer" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label><h:outputText
+                                                    value="#{msg['facelet.label.statemachine']}"/><span
+                                                    class="text-danger">*</span></label>
+                                            <h:selectOneListbox class="select"
+                                                                disabled="#{!processStepController.canDelete(processStepController.entity)}"
+                                                                value="#{processStepController.entity.stateMachine}">
+                                                <f:selectItems value="#{stateMachinesController.entities}" var="y"
+                                                               itemLabel="#{y.name}" itemValue="#{y}"/>
+                                            </h:selectOneListbox>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label><h:outputText
+                                                    value="#{msg['facelet.label.carrierType.preparation']}"/></label>
+                                            <h:selectOneListbox class="select"
+                                                                disabled="#{!processStepController.canDelete(processStepController.entity)}"
+                                                                value="#{processStepController.entity.preparation}">
+                                                <f:selectItems value="#{carrierTypesController.entities}" var="ct"
+                                                               itemLabel="#{ct.name}" itemValue="#{ct}"/>
+                                            </h:selectOneListbox>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label><h:outputText
+                                                    value="#{msg['facelet.label.carrierType.output']}"/></label>
+                                            <h:selectOneListbox class="select"
+                                                                disabled="#{!processStepController.canDelete(processStepController.entity)}"
+                                                                value="#{processStepController.entity.output}">
+                                                <f:selectItems value="#{carrierTypesController.entities}" var="ct"
+                                                               itemLabel="#{ct.name}" itemValue="#{ct}"/>
+                                            </h:selectOneListbox>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label><h:outputText
+                                                    value="#{msg['facelet.label.workstation']}"/><span
+                                                    class="text-danger">*</span></label>
+                                            <h:selectOneListbox class="select"
+                                                                disabled="#{!processStepController.canDelete(processStepController.entity)}"
+                                                                value="#{processStepController.entity.workstation}"
+                                                                converter="workstationConverter">
+                                                <f:selectItems value="#{workstationsController.entities}" var="ws"
+                                                               itemLabel="#{ws.name}" itemValue="#{ws}"/>
+                                            </h:selectOneListbox>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label><h:outputText value="#{msg['facelet.label.parameter']}"/><span
+                                                    class="text-danger">*</span></label>
+                                            <h:selectManyListbox class="select"
+                                                                 disabled="#{!processStepController.canDelete(processStepController.entity)}"
+                                                                 value="#{processStepController.entity.parameters}"
+                                                                 collectionType="java.util.ArrayList"
+                                                                 converter="parameterConverter">
+                                                <c:forEach items="#{parametersController.entities}" var="parameter">
+                                                    <f:selectItem itemValue="#{parameter}"
+                                                                  itemLabel="#{parameter.field}"/>
+                                                </c:forEach>
+                                            </h:selectManyListbox>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <h:outputText styleClass="kcb-form-label"
+                                                          value="#{msg['facelet.label.modifies']}"/>
+                                            <p:selectBooleanButton id="edit-modifies"
+                                                                   disabled="#{!processStepController.canDelete(processStepController.entity)}"
+                                                                   styleClass="kcb-boolean-select"
+                                                                   value="#{processStepController.entity.modifies}"
+                                                                   onLabel="#{localeController.formatString('core.yes')}"
+                                                                   offLabel="#{localeController.formatString('core.no')}"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <h:outputText styleClass="kcb-form-label"
+                                                          value="#{msg['facelet.label.creates']}"/>
+                                            <p:selectBooleanButton id="edit-creates"
+                                                                   disabled="#{!processStepController.canDelete(processStepController.entity)}"
+                                                                   styleClass="kcb-boolean-select"
+                                                                   value="#{processStepController.entity.creates}"
+                                                                   onLabel="#{localeController.formatString('core.yes')}"
+                                                                   offLabel="#{localeController.formatString('core.no')}"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <h:outputText styleClass="kcb-form-label"
+                                                          value="#{msg['facelet.label.destroys']}"/>
+                                            <p:selectBooleanButton id="edit-destroys"
+                                                                   disabled="#{!processStepController.canDelete(processStepController.entity)}"
+                                                                   styleClass="kcb-boolean-select"
+                                                                   value="#{processStepController.entity.deletes}"
+                                                                   onLabel="#{localeController.formatString('core.yes')}"
+                                                                   offLabel="#{localeController.formatString('core.no')}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="submit-section">
+                                    <h:commandLink class="btn btn--primary submit-btn"
+                                                   action="#{processStepController.update()}">
+                                        <h:outputText value="#{msg['facelet.label.save']}"/>
+                                    </h:commandLink>
+                                </div>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--                    DELETE PROCESSSTEP (POP UP)                        -->
+            <div class="modal custom-modal fade" id="delete_processStep" role="dialog">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <div class="form-header">
+                                <h3><h:outputText value="#{msg['facelet.label.delete-processstep']}"/></h3>
+                                <p><h:outputText value="#{msg['facelet.label.delete-processstep-confirm']}"/></p>
+                            </div>
+                            <div class="modal-btn delete-action">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <h:form>
+                                            <div class="submit-section">
+                                                <h:commandLink class="btn btn-primary continue-btn"
+                                                               action="#{processStepController.delete()}">
+                                                    <h:outputText value="#{msg['facelet.label.delete']}"/>
+                                                </h:commandLink>
+                                            </div>
+                                        </h:form>
+                                    </div>
+                                    <div class="col-6">
+                                        <a href="javascript:void(0);" data-dismiss="modal"
+                                           class="btn btn-primary cancel-btn"><h:outputText
+                                                value="#{msg['facelet.label.cancel']}"/></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </f:view>
+    <c:forEach items="#{processChainController.getMessageQueue()}" var="message">
+        <div class="alert">
+            <div class="alert-icon">
+                <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                    <path fill="var(--color)" d="M10 3H14V14H10V3M10 21V17H14V21H10Z"/>
+                </svg>
+            </div>
+
+            <p class="alert-message">
+                <h:outputText value="#{message.getDetail()}"/>
+            </p>
+
+            <div class="spacer"></div>
+            <div class="alert-dismiss">
+                <h:form>
+                    <h:commandLink action="#{processChainController.removeMessageQueue()}">close</h:commandLink>
+                </h:form>
+            </div>
+        </div>
+    </c:forEach>
+</h:body>
+<ui:insert>
+    <ui:include src="scripts.xhtml"/>
+</ui:insert>
+</html>
+
+

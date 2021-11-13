@@ -1,0 +1,538 @@
+<?xml version = "1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:kcb="http://kcb.mschaeff.de" xmlns:c="http://java.sun.com/jsp/jstl/core"
+>
+
+<h:head>
+    <title>#{msg['facelet.label.title-dashboard']}</title>
+    <meta name="viewport" content="width=device-width"/>
+    <link rel="shortcut icon" type="image/x-icon" href="#{request.contextPath}/svg/favicon.ico"/>
+
+    <!-- Librarys -->
+    <link rel="stylesheet" href="css/bootstrap.css" media="all"/>
+    <link rel="stylesheet" href="css/dataTables.bootstrap4.min.css" media="all"/>
+    <link rel="stylesheet" href="css/select2.min.css" media="all"/>
+    <link rel="stylesheet" href="css/font-awesome.css" media="all"/>
+    <link rel="stylesheet" href="css/line-awesome.min.css" media="all"/>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/main.css" media="all"/>
+
+    <!-- Load early for Darkmode -->
+    <script type="text/javascript" src="js/libs/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="js/modules/darkmode_load.js"></script>
+
+    <!-- Scripts that need to be launched in the header -->
+    <script type="text/javascript" src="js/modules/validate.js"></script>
+    <script type="text/javascript" src="js/modules/selectBoxes.js"></script>
+</h:head>
+<h:body>
+    <!-- Custom Primfaces Theme -->
+    <link rel="stylesheet" href="css/components.css" media="all"/>
+    <f:view locale="#{localeController.currentLocale}">
+        <ui:insert>
+            <ui:include src="navigation.xhtml"/>
+        </ui:insert>
+
+        <div id="view" class="main-body #{navBarController.static}">
+            <div class="row l-mar-32--b">
+                <div class="col-md-12">
+                    <div class="welcome-box">
+                        <div class="welcome-det">
+                            <h3>#{msg['core.welcome']}, #{userController.getExecutingUser().firstName} #{userController.getExecutingUser().lastName}</h3>
+                            <div class="row" style="padding-left: 10px;">
+                                <ui:repeat value="#{userController.getExecutingUser().getRoles()}" var="role">
+                                    <span class="l-mar-4 badge #{usersController.roleToBadge(role)}">#{role.readable()}</span>
+                                </ui:repeat>
+                            </div>
+                            <h:outputText value="#{now}">
+                                <f:convertDateTime type="date" dateStyle="full" locale="de"/>
+                            </h:outputText>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 col-sm-6 col-lg-6 col-xl-3 l-mar-16--b">
+                    <div class="card dash-widget">
+                        <div class="card-body">
+                            <span class="dash-widget-icon"><em class="icon-deep-learning"></em></span>
+                            <div class="dash-widget-info">
+                                <h3>#{processchainsController.entities.size()}</h3>
+                                <span>#{msg['facelet.label.navigation.processchains']}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-6 col-lg-6 col-xl-3 l-mar-16--b">
+                    <div class="card dash-widget">
+                        <div class="card-body">
+                            <span class="dash-widget-icon"><em class="icon-unlocked-security"></em></span>
+                            <div class="dash-widget-info">
+                                <h3>#{jobsController.pending.size()}</h3>
+                                <span>#{msg['facelet.label.navigation.pendingJobs']}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-6 col-lg-6 col-xl-3 l-mar-16--b">
+                    <div class="card dash-widget">
+                        <div class="card-body">
+                            <span class="dash-widget-icon"><em class="icon-blank-closed-padlock"></em></span>
+                            <div class="dash-widget-info">
+                                <h3>#{jobsController.active.size()}</h3>
+                                <span>#{msg['facelet.label.dashboard.active-jobs']}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-6 col-lg-6 col-xl-3 l-mar-16--b">
+                    <div class="card dash-widget">
+                        <div class="card-body">
+                            <span class="dash-widget-icon"><em class="icon-user"></em></span>
+                            <div class="dash-widget-info">
+                                <h3>#{usersController.entities.size()}</h3>
+                                <span>#{msg['facelet.label.title-users']}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-6 col-lg-6 col-xl-3 l-mar-16--b">
+                    <div class="card dash-widget">
+                        <div class="card-body">
+                            <span class="dash-widget-icon"><em class="icon-laboratory-bench"></em></span>
+                            <div class="dash-widget-info">
+                                <h3>#{workstationsController.active.size()}</h3>
+                                <span>#{msg['facelet.label.title-workstations']}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-6 col-lg-6 col-xl-3 l-mar-16--b">
+                    <div class="card dash-widget">
+                        <div class="card-body">
+                            <span class="dash-widget-icon"><em class="icon-medical-samples"></em></span>
+                            <div class="dash-widget-info">
+                                <h3>#{assembliesController.entities.size()}</h3>
+                                <span>#{msg['facelet.label.assemblies']}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-6 col-lg-6 col-xl-3 l-mar-16--b">
+                    <div class="card dash-widget">
+                        <div class="card-body">
+                            <span class="dash-widget-icon"><em class="icon-blood-sample"></em></span>
+                            <div class="dash-widget-info">
+                                <h3>#{carriersController.entities.size()}</h3>
+                                <span>#{msg['facelet.label.carriers']}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-6 col-lg-6 col-xl-3 l-mar-16--b">
+                    <div class="card dash-widget">
+                        <div class="card-body">
+                            <span class="dash-widget-icon"><em class="icon-diagram"></em></span>
+                            <div class="dash-widget-info">
+                                <h3>#{stateMachinesController.entities.size()}</h3>
+                                <span>#{msg['facelet.label.title-statemachines']}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--                LAST JOBS (PKP)             -->
+            <div class="row">
+                <kcb:roleConditional roles="PKP">
+                    <div class="col-md-6 d-flex l-mar-16--b">
+                        <div class="card card-table flex-fill">
+                            <div class="card-header">
+                                <h3 class="card-title mb-0">#{msg['facelet.label.dashboard.jobs.importantJobs']}</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table custom-table mb-0">
+                                        <thead>
+                                        <tr>
+                                            <th>#{msg['facelet.label.dashboard.jobs.title']}</th>
+                                            <th>#{msg['facelet.label.dashboard.jobs.progress']}</th>
+                                            <th></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <ui:repeat value="#{jobsController.getThreeMostImportantJobs()}" var="job">
+                                            <tr>
+                                                <td>
+                                                    <h2><a href="jobs.xhtml">#{job.name}</a></h2>
+                                                    <small class="block text-ellipsis">
+                                                        <span>#{jobController.getCurrentProgressInChain(job)}</span> <span class="text-muted">#{msg['facelet.label.dashboard.jobs.stepsDone']}, </span>
+                                                        <span>#{jobController.getRemainingProgressInChain(job)}</span> <span class="text-muted">#{msg['facelet.label.dashboard.jobs.stepsLeft']}</span>
+                                                    </small>
+                                                </td>
+                                                <td>
+                                                    <div class="progress progress-md progress-striped">
+                                                        <div class="progress-bar" role="progressbar" data-toggle="tooltip"
+                                                             title="#{jobController.getProgressInProcessChain(job)}%" style="width: #{jobController.getProgressInProcessChain(job)}%"></div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </ui:repeat>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <a href="jobs.xhtml">#{msg['facelet.label.dashboard.jobs.allJobs']}</a>
+                            </div>
+                        </div>
+                    </div>
+                </kcb:roleConditional>
+
+                <!--                ASSIGNED WORKSTATIONS (TECHNOLOGE ONLY)                 -->
+                <kcb:roleConditional roles="TECHNOLOGE">
+                <div class="col-md-6 d-flex l-mar-32--b">
+                    <div class="card card-table flex-fill">
+                        <div class="card-header">
+                            <h3 class="card-title mb-0"><h:outputText value="#{msg['facelet.label.dashboard.workstation-overview']}"/></h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table custom-table mb-0">
+                                    <thead>
+                                    <tr>
+                                        <th><h:outputText value="#{msg['facelet.label.dashboard.workstation']}"/></th>
+                                        <th><h:outputText value="#{msg['facelet.label.dashboard.workstation-active']}"/></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    <c:if test="#{workstationsController.allForCurrentTechnologe.size() == 0}">
+                                        <tr>
+                                            <td>
+                                                <p><h:outputText value="#{msg['facelet.label.dashboard.noWorkstationFound']}" /></p>
+                                            </td>
+                                        </tr>
+                                    </c:if>
+                                    <c:if test="#{workstationsController.allForCurrentTechnologe.size() >= 1}">
+                                        <tr>
+                                            <td>
+                                                <a href="workstation.xhtml?id=#{workstationsController.allForCurrentTechnologe.get(0).id}">#{workstationsController.allForCurrentTechnologe.get(0).name}</a>
+                                            </td>
+                                            <td>
+                                                <h:panelGroup rendered="#{workstationsController.allForCurrentTechnologe.get(0).active}">
+                                                    <span class="badge bg-inverse-success">#{msg['facelet.label.active']}</span>
+                                                </h:panelGroup>
+                                                <h:panelGroup rendered="#{workstationsController.allForCurrentTechnologe.get(0).active == false}">
+                                                    <span class="badge bg-inverse-danger">#{msg['facelet.label.inactive']}</span>
+                                                </h:panelGroup>
+                                            </td>
+                                        </tr>
+                                    </c:if>
+                                    <c:if test="#{workstationsController.allForCurrentTechnologe.size() >= 2}">
+                                        <tr>
+                                            <td>
+                                                <a href="workstation.xhtml?id=#{workstationsController.allForCurrentTechnologe.get(1).id}">#{workstationsController.allForCurrentTechnologe.get(1).name}</a>
+                                            </td>
+                                            <td>
+                                                <h:panelGroup rendered="#{workstationsController.allForCurrentTechnologe.get(1).active}">
+                                                    <span class="badge bg-inverse-success">#{msg['facelet.label.active']}</span>
+                                                </h:panelGroup>
+                                                <h:panelGroup rendered="#{workstationsController.allForCurrentTechnologe.get(1).active == false}">
+                                                    <span class="badge bg-inverse-danger">#{msg['facelet.label.inactive']}</span>
+                                                </h:panelGroup>
+                                            </td>
+                                        </tr>
+                                    </c:if>
+                                    <c:if test="#{workstationsController.allForCurrentTechnologe.size() >= 3}">
+                                        <tr>
+                                            <td>
+                                                <a href="workstation.xhtml?id=#{workstationsController.allForCurrentTechnologe.get(2).id}">#{workstationsController.allForCurrentTechnologe.get(2).name}</a>
+                                            </td>
+                                            <td>
+                                                <h:panelGroup rendered="#{workstationsController.allForCurrentTechnologe.get(2).active}">
+                                                    <span class="badge bg-inverse-success">#{msg['facelet.label.active']}</span>
+                                                </h:panelGroup>
+                                                <h:panelGroup rendered="#{workstationsController.allForCurrentTechnologe.get(2).active == false}">
+                                                    <span class="badge bg-inverse-danger">#{msg['facelet.label.inactive']}</span>
+                                                </h:panelGroup>
+                                            </td>
+                                        </tr>
+                                    </c:if>
+                                    <c:if test="#{workstationsController.allForCurrentTechnologe.size() >= 4}">
+                                        <tr>
+                                            <td>
+                                                <a href="workstation.xhtml?id=#{workstationsController.allForCurrentTechnologe.get(3).id}">#{workstationsController.allForCurrentTechnologe.get(3).name}</a>
+                                            </td>
+                                            <td>
+                                                <h:panelGroup rendered="#{workstationsController.allForCurrentTechnologe.get(3).active}">
+                                                    <span class="badge bg-inverse-success">#{msg['facelet.label.active']}</span>
+                                                </h:panelGroup>
+                                                <h:panelGroup rendered="#{workstationsController.allForCurrentTechnologe.get(3).active == false}">
+                                                    <span class="badge bg-inverse-danger">#{msg['facelet.label.inactive']}</span>
+                                                </h:panelGroup>
+                                            </td>
+                                        </tr>
+                                    </c:if>
+                                    <c:if test="#{workstationsController.allForCurrentTechnologe.size() >= 5}">
+                                        <tr>
+                                            <td>
+                                                <a href="workstation.xhtml?id=#{workstationsController.allForCurrentTechnologe.get(4).id}">#{workstationsController.allForCurrentTechnologe.get(4).name}</a>
+                                            </td>
+                                            <td>
+                                                <h:panelGroup rendered="#{workstationsController.allForCurrentTechnologe.get(4).active}">
+                                                    <span class="badge bg-inverse-success">#{msg['facelet.label.active']}</span>
+                                                </h:panelGroup>
+                                                <h:panelGroup rendered="#{workstationsController.allForCurrentTechnologe.get(4).active == false}">
+                                                    <span class="badge bg-inverse-danger">#{msg['facelet.label.inactive']}</span>
+                                                </h:panelGroup>
+                                            </td>
+                                        </tr>
+                                    </c:if>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <a href="workstations.xhtml"><h:outputText value="#{msg['facelet.label.dashboard.allAssignedWS']}" /></a>
+                        </div>
+                    </div>
+                </div>
+                </kcb:roleConditional>
+                <!--               / ASSIGNED WORKSTATIONS                  -->
+
+
+                <!--                ACTIVE JOBS (TECHNOLOGE)                -->
+                <kcb:roleConditional roles="TECHNOLOGE">
+                    <div class="col-md-6 d-flex l-mar-32--b">
+                        <div class="card card-table flex-fill">
+                            <div class="card-header">
+                                <h3 class="card-title mb-0"><h:outputText value="#{msg['facelet.label.dashboard.active-jobs']}"/></h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table custom-table mb-0">
+                                        <thead>
+                                        <tr>
+                                            <th><h:outputText value="#{msg['facelet.label.name']}"/></th>
+                                            <th><h:outputText value="#{msg['facelet.label.priority']}"/></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        <c:if test="#{jobsController.allActiveJobForCurrentTechnologeNotBeingTransported.size() == 0}">
+                                            <tr>
+                                                <td>
+                                                    <p><h:outputText value="#{msg['facelet.label.dashboard.noActiveJobsFound']}" /></p>
+                                                </td>
+                                            </tr>
+                                        </c:if>
+                                        <c:if test="#{jobsController.allActiveJobForCurrentTechnologeNotBeingTransported.size() >= 1}">
+                                            <tr>
+                                                <td>
+                                                    <a href="#{jobsController.getWorkstationRedirectURL(jobsController.allActiveJobForCurrentTechnologeNotBeingTransported.get(0))}">
+                                                        #{jobsController.allActiveJobForCurrentTechnologeNotBeingTransported.get(0).name}
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <span class="badge"
+                                                          style="background-color:#{prioritiesController.getColor(jobsController.allActiveJobForCurrentTechnologeNotBeingTransported.get(0).priority)}">
+                                                        #{jobsController.allActiveJobForCurrentTechnologeNotBeingTransported.get(0).priority.name}</span>
+                                                </td>
+                                            </tr>
+                                        </c:if>
+                                        <c:if test="#{jobsController.allActiveJobForCurrentTechnologeNotBeingTransported.size() >= 2}">
+                                            <tr>
+                                                <td>
+                                                    <a href="#{jobsController.getWorkstationRedirectURL(jobsController.allActiveJobForCurrentTechnologeNotBeingTransported.get(1))}">
+                                                        #{jobsController.allActiveJobForCurrentTechnologeNotBeingTransported.get(1).name}
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                   <span class="badge"
+                                                         style="background-color:#{prioritiesController.getColor(jobsController.allActiveJobForCurrentTechnologeNotBeingTransported.get(1).priority)}">
+                                                        #{jobsController.allActiveJobForCurrentTechnologeNotBeingTransported.get(1).priority.name}</span>
+                                                </td>
+                                            </tr>
+                                        </c:if>
+                                        <c:if test="#{jobsController.allActiveJobForCurrentTechnologeNotBeingTransported.size() >= 3}">
+                                            <tr>
+                                                <td>
+                                                    <a href="#{jobsController.getWorkstationRedirectURL(jobsController.allActiveJobForCurrentTechnologeNotBeingTransported.get(2))}">
+                                                        #{jobsController.allActiveJobForCurrentTechnologeNotBeingTransported.get(2).name}
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <span class="badge"
+                                                          style="background-color:#{prioritiesController.getColor(jobsController.allActiveJobForCurrentTechnologeNotBeingTransported.get(2).priority)}">
+                                                        #{jobsController.allActiveJobForCurrentTechnologeNotBeingTransported.get(2).priority.name}</span>
+                                                </td>
+                                            </tr>
+                                        </c:if>
+                                        <c:if test="#{jobsController.allActiveJobForCurrentTechnologeNotBeingTransported.size() >= 4}">
+                                            <tr>
+                                                <td>
+                                                    <a href="#{jobsController.getWorkstationRedirectURL(jobsController.allActiveJobForCurrentTechnologeNotBeingTransported.get(3))}">
+                                                        #{jobsController.allActiveJobForCurrentTechnologeNotBeingTransported.get(3).name}
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <span class="badge"
+                                                          style="background-color:#{prioritiesController.getColor(jobsController.allActiveJobForCurrentTechnologeNotBeingTransported.get(3).priority)}">
+                                                        #{jobsController.allActiveJobForCurrentTechnologeNotBeingTransported.get(3).priority.name}</span>
+                                                </td>
+                                            </tr>
+                                        </c:if>
+                                        <c:if test="#{jobsController.allActiveJobForCurrentTechnologeNotBeingTransported.size() >= 5}">
+                                            <tr>
+                                                <td>
+                                                    <a href="#{jobsController.getWorkstationRedirectURL(jobsController.allActiveJobForCurrentTechnologeNotBeingTransported.get(4))}">
+                                                        #{jobsController.allActiveJobForCurrentTechnologeNotBeingTransported.get(4).name}
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <span class="badge"
+                                                          style="background-color:#{prioritiesController.getColor(jobsController.allActiveJobForCurrentTechnologeNotBeingTransported.get(4).priority)}">
+                                                        #{jobsController.allActiveJobForCurrentTechnologeNotBeingTransported.get(4).priority.name}</span>
+                                                </td>
+                                            </tr>
+                                        </c:if>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <a href="workstations.xhtml"><h:outputText value="#{msg['facelet.label.dashboard.allAssignedWS']}" /></a>
+                            </div>
+                        </div>
+                    </div>
+                </kcb:roleConditional>
+                <!--               / ACTIVE JOBS (TECHNOLOGE)                  -->
+
+
+                <!--                PENDING JOBS (LOGISTIKER ONLY)                 -->
+                <kcb:roleConditional roles="LOGISTIKER">
+                    <div class="col-md-6 d-flex l-mar-32--b">
+                        <div class="card card-table flex-fill">
+                            <div class="card-header">
+                                <h3 class="card-title mb-0"><h:outputText value="#{msg['facelet.label.dashboard.pendingJobs-overview']}"/></h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table custom-table mb-0">
+                                        <thead>
+                                        <tr>
+                                            <th><h:outputText value="#{msg['facelet.label.name']}"/></th>
+                                            <th><h:outputText value="#{msg['facelet.label.priority.value']}"/></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <c:if test="#{jobsController.pending.size() == 0}">
+                                            <tr>
+                                                <td>
+                                                    <p><h:outputText value="#{msg['facelet.label.dashboard.noPendingJobs']}" /></p>
+                                                </td>
+                                            </tr>
+                                        </c:if>
+                                        <c:if test="#{jobsController.pending.size() >= 1}">
+                                            <tr>
+                                                <td>
+                                                    <a href="jobs.xhtml">#{jobsController.pending.get(0).name}</a>
+                                                </td>
+                                                <td>
+                                                    <span class="badge" style="background-color:#{prioritiesController.getColor(jobsController.pending.get(0).priority)}">#{jobsController.pending.get(0).priority.name}</span>
+                                                </td>
+                                            </tr>
+                                        </c:if>
+                                        <c:if test="#{jobsController.pending.size() >= 2}">
+                                            <tr>
+                                                <td>
+                                                    <a href="jobs.xhtml">#{jobsController.pending.get(1).name}</a>
+                                                </td>
+                                                <td>
+                                                    <span class="badge" style="background-color:#{prioritiesController.getColor(jobsController.pending.get(1).priority)}">#{jobsController.pending.get(1).priority.name}</span>
+
+                                                </td>
+                                            </tr>
+                                        </c:if>
+                                        <c:if test="#{jobsController.pending.size() >= 3}">
+                                            <tr>
+                                                <td>
+                                                    <a href="jobs.xhtml">#{jobsController.pending.get(2).name}</a>
+                                                </td>
+                                                <td>
+                                                    <span class="badge" style="background-color:#{prioritiesController.getColor(jobsController.pending.get(2).priority)}">#{jobsController.pending.get(2).priority.name}</span>
+                                                </td>
+                                            </tr>
+                                        </c:if>
+                                        <c:if test="#{jobsController.pending.size() >= 4}">
+                                            <tr>
+                                                <td>
+                                                    <a href="jobs.xhtml">#{jobsController.pending.get(3).name}</a>
+                                                </td>
+                                                <td>
+                                                    <span class="badge" style="background-color:#{prioritiesController.getColor(jobsController.pending.get(3).priority)}">#{jobsController.pending.get(3).priority.name}</span>
+                                                </td>
+                                            </tr>
+                                        </c:if>
+                                        <c:if test="#{jobsController.pending.size() >= 5}">
+                                            <tr>
+                                                <td>
+                                                    <a href="jobs.xhtml">#{jobsController.pending.get(4).name}</a>
+                                                </td>
+                                                <td>
+                                                    <span class="badge" style="background-color:#{prioritiesController.getColor(jobsController.pending.get(4).priority)}">#{jobsController.pending.get(4).priority.name}</span>
+                                                </td>
+                                            </tr>
+                                        </c:if>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <a href="jobs.xhtml"><h:outputText value="#{msg['facelet.label.all-pending-jobs']}" /> </a>
+                            </div>
+                        </div>
+                    </div>
+                </kcb:roleConditional>
+                <!--               / PENDING JOBS                  -->
+
+            </div>
+        </div>
+    </f:view>
+    <c:forEach items="#{workstationController.getMessageQueue()}" var="message">
+        <div class="alert">
+            <div class="alert-icon">
+                <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                    <path fill="var(--color)" d="M10 3H14V14H10V3M10 21V17H14V21H10Z"/>
+                </svg>
+            </div>
+
+            <p class="alert-message">
+                <h:outputText value="#{message.getDetail()}"/>
+            </p>
+
+            <div class="spacer"></div>
+            <div class="alert-dismiss">
+                <h:form>
+                    <h:commandLink action="#{workstationController.removeMessageQueue()}">close</h:commandLink>
+                </h:form>
+            </div>
+        </div>
+    </c:forEach>
+</h:body>
+
+<ui:insert>
+    <ui:include src="scripts.xhtml"/>
+</ui:insert>
+
+</html>
+
+

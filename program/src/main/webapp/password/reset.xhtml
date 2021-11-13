@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+>
+<h:head>
+    <title>#{msg['facelet.label.reset.password.title']}</title>
+    <meta name="viewport" content="width=device-width"/>
+
+    <link rel="shortcut icon" type="image/x-icon" href="#{request.contextPath}/svg/favicon.ico"/>
+    <!-- Librarys -->
+    <link rel="stylesheet" href="../css/bootstrap.css" media="all"/>
+    <link rel="stylesheet" href="../css/bootstrap-datetimepicker.min.css" media="all"/>
+    <link rel="stylesheet" href="../css/dataTables.bootstrap4.min.css" media="all"/>
+    <link rel="stylesheet" href="../css/fullcalendar.min.css" media="all"/>
+    <link rel="stylesheet" href="../css/select2.min.css" media="all"/>
+    <link rel="stylesheet" href="../css/font-awesome.css" media="all"/>
+    <link rel="stylesheet" href="../css/line-awesome.min.css" media="all"/>
+    <!-- End Librarys -->
+
+    <!-- Custom CSS and PatternLab -->
+    <link rel="stylesheet" href="../css/main.css" media="all"/>
+    <!-- End Custom CSS and PatternLab -->
+</h:head>
+<h:body>
+    <f:view>
+
+        <div class="account-page">
+            <div class="main-wrapper">
+                <div class="account-content">
+                    <div class="container">
+                        <div class="account-logo">
+                            <a href="../dashboard.xhtml"><span class="icon-cowboy login-icon"
+                                                               alt="Karstens Cowboys"></span></a>
+                        </div>
+                        <div class="account-box">
+                            <div class="account-wrapper">
+                                <h3 class="account-title">#{msg['facelet.label.reset.password.title']}</h3>
+                                <h:form>
+                                    <div class="form-group">
+                                        <label>#{msg['facelet.label.email']}</label>
+                                        <h:inputText id="email" value="#{passwordResetController.email}"
+                                                     class="form-control" type="text"/>
+                                    </div>
+
+                                    <div class="submit-section">
+                                        <h:commandLink class="btn btn-primary account-btn"
+                                                       action="#{passwordResetController.submit()}">
+                                            #{msg['facelet.label.reset']}
+                                        </h:commandLink>
+                                    </div>
+                                    <div class="account-footer l-mar-16--t">
+                                        <p>#{msg['facelet.label.reset.password']}</p>
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /Main Wrapper -->
+        </div>
+
+    </f:view>
+</h:body>
+</html>

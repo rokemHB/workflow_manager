@@ -1,0 +1,52 @@
+[
+  {
+    "step" : "Prozessschritt 2 K",
+    "parameters": [
+          {"field": "Temperatur", "value" : "2", "unit": "°C"},
+          {"field": "Druck", "value": "12"},
+          {"field": "Zeit", "value" : "20", "unit": "Minuten"},
+          {"field": "Luftfeuchtigkeit", "value": "10"},
+          {"field": "Windstärke", "value": "6", "unit": "Bft"}
+		 ]
+  },
+  {
+    "step" : "Prozessschritt 5 K",
+    "parameters": [
+          {"field": "Temperatur", "value" : "52", "unit": "°C"},
+          {"field": "Druck", "value": "12"},
+          {"field": "Zeit", "value" : "20", "unit": "Minuten"},
+          {"field": "Luftfeuchtigkeit", "value": "10"},
+          {"field": "Windstärke", "value": "6", "unit": "Bft"}
+		 ]
+  },
+  {
+    "step" : "Prozessschritt 8 K",
+    "parameters": [
+          {"field": "Temperatur", "value" : "222", "unit": "°C"},
+          {"field": "Druck", "value": "123"},
+          {"field": "Zeit", "value" : "2", "unit": "Minuten"},
+          {"field": "Luftfeuchtigkeit", "value": "10"},
+          {"field": "Windstärke", "value": "1", "unit": "Bft"}
+		 ]
+  },
+  {
+    "step" : "Prozessschritt 11 K",
+    "parameters": [
+          {"field": "Temperatur", "value" : "777", "unit": "°C"},
+          {"field": "Druck", "value": "123"
+          {"field": "Zeit", "value" : "20", "unit": "Minuten"},
+          {"field": "Luftfeuchtigkeit", "value": "10"},
+          {"field": "Windstärke", "value": "6", "unit": "Bft"}
+		 ]
+  },
+  {
+    "step" : "Prozessschritt 14 K",
+    "parameters": [
+          {"field": "Temperatur", "value" : "23", "unit": "°C"},
+          {"field": "Druck", "value": "1"},
+          {"field": "Zeit", "value" : "2220", "unit": "Minuten"},
+          {"field": "Luftfeuchtigkeit", "value": "310"},
+          {"field": "Windstärke", "value": "4", "unit": "Bft"}
+		 ]
+  }
+]

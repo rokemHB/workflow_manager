@@ -1,0 +1,1 @@
+java -cp $1 org.h2.tools.Server -baseDir $2

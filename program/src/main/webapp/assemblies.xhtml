@@ -1,0 +1,435 @@
+<?xml version = "1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:kcb="http://kcb.mschaeff.de">
+
+<h:head>
+    <title>#{msg['facelet.label.title-assemblies']}</title>
+    <meta name="viewport" content="width=device-width"/>
+    <link rel="shortcut icon" type="image/x-icon" href="#{request.contextPath}/svg/favicon.ico"/>
+
+    <!-- Librarys -->
+    <link rel="stylesheet" href="css/bootstrap.css" media="all"/>
+    <link rel="stylesheet" href="css/dataTables.bootstrap4.min.css" media="all"/>
+    <link rel="stylesheet" href="css/select2.min.css" media="all"/>
+    <link rel="stylesheet" href="css/font-awesome.css" media="all"/>
+    <link rel="stylesheet" href="css/line-awesome.min.css" media="all"/>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/main.css" media="all"/>
+
+    <!-- Load early for Darkmode -->
+    <script type="text/javascript" src="js/libs/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="js/modules/darkmode_load.js"></script>
+
+    <!-- Scripts that need to be launched in the header -->
+    <script type="text/javascript" src="js/modules/validate.js"></script>
+    <script type="text/javascript" src="js/modules/selectBoxes.js"></script>
+</h:head>
+<h:body>
+    <!-- Custom Primfaces Theme -->
+    <link rel="stylesheet" href="css/components.css" media="all"/>
+    <f:view locale="#{localeController.currentLocale}">
+        <ui:insert>
+            <ui:include src="navigation.xhtml"/>
+        </ui:insert>
+
+        <div id="view" class="main-body #{navBarController.static}">
+            <div class="page-header l-mar-32--b">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h3 class="page-title">#{msg['facelet.label.navigation.assembly']}</h3>
+                        <ul class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="dashboard.xhtml">#{msg['facelet.label.navigation.dashboard']}</a></li>
+                            <li class="breadcrumb-item active">#{msg['facelet.label.navigation.assembly']}</li>
+                        </ul>
+                    </div>
+                    <kcb:roleConditional roles="TECHNOLOGE, LOGISTIKER" operation="OR">
+                    <div class="col-auto float-right ml-auto">
+                        <h:form>
+                            <a class="btn add-btn btn--primary" data-toggle="modal" href="#add_assembly"><em
+                                    class="fa fa-plus l-pad-8--r"></em> <h:outputText value="#{msg['facelet.label.add-assembly']}"/></a>
+                        </h:form>
+                    </div>
+                    </kcb:roleConditional>
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="l-grid-12">
+                    <div class="row">
+                        <div class="l-grid-12">
+                            <div class="table-responsive">
+                                <table id="users" class="table table-striped custom-table datatable"
+                                       data-module="table">
+                                    <thead>
+                                    <tr>
+                                        <th><h:outputText value="#{msg['facelet.label.assemblyId']}"/></th>
+                                        <th><h:outputText value="#{msg['facelet.label.carrierType']}"/></th>
+                                        <th><h:outputText value="#{msg['facelet.label.alloy']}"/></th>
+                                        <th><h:outputText value="#{msg['facelet.label.modifications']}"/></th>
+                                        <th><h:outputText value="#{msg['facelet.label.sampleCount']}"/></th>
+                                        <th class="table-hidden"><h:outputText value="#{msg['facelet.label.comment']}"/>
+                                        </th>
+                                        <th class="no-sort"></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <ui:repeat value="#{assembliesController.entities}" var="assembly">
+                                        <tr>
+                                            <td>#{assembly.assemblyID}</td>
+                                            <td>#{assembly.carriers.get(0).carrierType.name}</td>
+                                            <td>#{assembly.alloy}</td>
+                                            <td>
+                                                <ui:repeat value="#{assembly.modifications}" var="modification" varStatus="status">
+                                                    #{modification.processStep.name} <h:panelGroup rendered="#{!status.last}"><span class="f-w--600">, </span></h:panelGroup>
+                                                </ui:repeat>
+                                            </td>
+                                            <td>#{assembly.sampleCount}</td>
+                                            <td class="table-hidden">#{assembly.comment}</td>
+
+                                            <td class="text-right">
+                                                <h:form>
+                                                    <div class="dropdown dropdown-action">
+                                                        <a href="#" class="action-icon dropdown-toggle"
+                                                           data-toggle="dropdown"
+                                                           aria-expanded="false"><em
+                                                                class="material-icons">more_vert</em></a>
+                                                        <div class="dropdown-menu dropdown-menu-right">
+                                                            <kcb:roleConditional roles="TECHNOLOGE, LOGISTIKER" operation="OR">
+                                                            <kcb:assemblyIsUnused assembly="#{assembly}">
+                                                            <span data-toggle="modal" data-target="#edit_assembly">
+                                                            <p:commandLink
+                                                                    action="#{assemblyController.updateEntity(assembly)}"
+                                                                    ajax="true"
+                                                                    styleClass="dropdown-item">
+                                                                <em class="fa fa-edit m-r-5"></em> <h:outputText
+                                                                    value="#{msg['facelet.label.edit']}"/>
+                                                            </p:commandLink>
+                                                            </span>
+                                                            <span data-toggle="modal" data-target="#delete_assembly">
+                                                            <p:commandLink
+                                                                    action="#{assemblyController.updateEntity(assembly)}"
+                                                                    ajax="true"
+                                                                    styleClass="dropdown-item">
+                                                                <em class="fa fa-trash-alt icon-more-padding m-r-5"></em> <h:outputText
+                                                                    value="#{msg['facelet.label.delete']}"/>
+                                                            </p:commandLink>
+                                                            </span>
+                                                            <span data-toggle="modal" data-target="#isolate">
+                                                            <p:commandLink
+                                                                    action="#{assemblyController.updateEntity(assembly)}"
+                                                                    ajax="true"
+                                                                    styleClass="dropdown-item">
+                                                                <em class="fa fa-cut icon-more-padding m-r-5"></em> <h:outputText
+                                                                    value="#{msg['facelet.label.isolate']}"/>
+                                                            </p:commandLink>
+                                                            </span>
+                                                            </kcb:assemblyIsUnused>
+                                                            </kcb:roleConditional>
+                                                            <kcb:roleConditional roles="TECHNOLOGE, LOGISTIKER, TRANSPORT" operation="OR">
+                                                            <span data-toggle="modal" data-target="#notify_loss">
+                                                            <p:commandLink
+                                                                    action="#{assemblyController.updateEntity(assembly)}"
+                                                                    ajax="true"
+                                                                    styleClass="dropdown-item">
+                                                                <em class="fa fa-flag m-r-5"></em> <h:outputText
+                                                                    value=" #{msg['facelet.label.notifyLoss']}"/>
+                                                            </p:commandLink>
+                                                            </span>
+                                                            </kcb:roleConditional>
+                                                        </div>
+                                                    </div>
+                                                </h:form>
+                                            </td>
+                                        </tr>
+                                    </ui:repeat>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div id="add_assembly" class="modal custom-modal fade" role="dialog" aria-modal="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><h:outputText value="#{msg['facelet.label.add-assembly']}"/></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <f:view>
+                                <f:event type="preRenderView" listener="#{assembliesController.refresh()}"/>
+                                <h:form onsubmit="#{assemblyController.reset()}">
+                                    <script type="application/javascript">update();</script>
+                                    <script type="application/javascript">select2();</script>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label><h:outputText value="#{msg['facelet.label.assemblyId']}"/><span
+                                                        class="text-danger">*</span></label>
+                                                <h:inputText id="assemblyID"
+                                                             value="#{assemblyController.entity.assemblyID}"
+                                                             class="form-control assembly-id" type="text"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label><h:outputText value="#{msg['facelet.label.alloy']}"/><span
+                                                        class="text-danger">*</span></label>
+                                                <h:inputText id="alloy" value="#{assemblyController.entity.alloy}"
+                                                             class="form-control assembly-alloy" type="text"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label><h:outputText value="#{msg['facelet.label.sampleCount']}"/><span
+                                                        class="text-danger">*</span></label>
+                                                <h:inputText id="sampleCount"
+                                                             value="#{assemblyController.entity.sampleCount}"
+                                                             class="form-control integer" type="text"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label><h:outputText value="#{msg['facelet.label.carriers']}"/><span
+                                                        class="text-danger">*</span></label>
+                                                <h:selectManyListbox class="select"
+                                                                     value="#{assemblyController.carriers}" collectionType="java.util.ArrayList">
+                                                    <c:forEach items="#{carriersController.getUnusedCarriers()}" var="carrier">
+                                                        <f:selectItem itemValue="#{carrier.id}"
+                                                                      itemLabel="#{carrier.carrierID}"/>
+                                                    </c:forEach>
+                                                </h:selectManyListbox>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label><h:outputText value="#{msg['facelet.label.comment']}"/></label>
+                                                <h:inputTextarea id="comment" value="#{assemblyController.entity.comment}"
+                                                                 class="form-control assembly-comment" type="email"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="submit-section">
+                                        <h:commandLink class="btn btn--primary submit-btn"
+                                                       action="#{assemblyController.create()}">
+                                            <h:outputText value="#{msg['facelet.label.create']}"/>
+                                        </h:commandLink>
+                                    </div>
+                                </h:form>
+                            </f:view>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="edit_assembly" class="modal custom-modal fade" role="dialog">
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><h:outputText value="#{msg['facelet.label.edit-assembly']}"/></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <h:form id="assembly_edit_form">
+                            <script type="application/javascript">update();</script>
+                            <script type="application/javascript">select2();</script>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label><h:outputText value="#{msg['facelet.label.assemblyId']}"/><span
+                                                class="text-danger">*</span></label>
+                                        <h:inputText id="editAssemblyId" value="#{assemblyController.entity.assemblyID}"
+                                                     class="form-control valid assembly-id" type="text"/>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label><h:outputText value="#{msg['facelet.label.alloy']}"/></label>
+                                        <h:inputText id="editAlloy" value="#{assemblyController.entity.alloy}"
+                                                     class="form-control valid assembly-alloy" type="text"/>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label><h:outputText value="#{msg['facelet.label.sampleCount']}"/><span
+                                                class="text-danger">*</span></label>
+                                        <h:inputText id="editSampleCount"
+                                                     value="#{assemblyController.entity.sampleCount}"
+                                                     class="form-control valid integer" type="text"/>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label><h:outputText value="#{msg['facelet.label.comment']}"/></label>
+                                        <h:inputText id="editComment" value="#{assemblyController.entity.comment}"
+                                                     class="form-control valid assembly-comment" type="text"/>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label><h:outputText value="#{msg['facelet.label.carriers']}"/><span
+                                                class="text-danger">*</span></label>
+                                        <h:selectManyListbox class="select"
+                                                             value="#{assemblyController.entity.carriers}" collectionType="java.util.ArrayList">
+                                            <c:forEach items="#{carriersController.entities}" var="carrier">
+                                                <f:selectItem itemValue="#{carrier}"
+                                                              itemLabel="#{carrier.carrierID}"/>
+                                            </c:forEach>
+                                        </h:selectManyListbox>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="submit-section">
+                                <h:commandLink class="btn btn--primary submit-btn"
+                                               action="#{assemblyController.update()}">
+                                    <h:outputText value="#{msg['facelet.label.save']}"/>
+                                </h:commandLink>
+                            </div>
+                        </h:form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal custom-modal fade" id="delete_assembly" role="dialog">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="form-header">
+                            <h3><h:outputText value="#{msg['facelet.label.delete-assembly']}"/></h3>
+                            <p><h:outputText value="#{msg['facelet.label.delete-assembly-confirm']}"/></p>
+                        </div>
+                        <div class="modal-btn delete-action">
+                            <div class="row">
+                                <div class="col-6">
+                                    <h:form>
+                                        <div class="submit-section">
+                                            <h:commandLink class="btn btn-primary continue-btn"
+                                                           action="#{assemblyController.delete()}">
+                                                <h:outputText value="#{msg['facelet.label.delete']}"/>
+                                            </h:commandLink>
+                                        </div>
+                                    </h:form>
+                                </div>
+                                <div class="col-6">
+                                    <a href="javascript:void(0);" data-dismiss="modal"
+                                       class="btn btn-primary cancel-btn"><h:outputText
+                                            value="#{msg['facelet.label.cancel']}"/></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal custom-modal fade" id="notify_loss" role="dialog">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="form-header">
+                            <h3><h:outputText value="#{msg['facelet.label.notifyLoss']}"/></h3>
+                            <p><h:outputText value="#{msg['facelet.label.notifyLoss-confirm']}"/></p>
+                        </div>
+                        <div class="modal-btn delete-action">
+                            <div class="row">
+                                <div class="col-6">
+                                    <h:form>
+                                        <div class="submit-section">
+                                            <h:commandLink class="btn btn-primary continue-btn"
+                                                           action="#{assemblyController.notifyLoss()}">
+                                                <h:outputText value="#{msg['facelet.label.notify']}"/>
+                                            </h:commandLink>
+                                        </div>
+                                    </h:form>
+                                </div>
+                                <div class="col-6">
+                                    <a href="javascript:void(0);" data-dismiss="modal"
+                                       class="btn btn-primary cancel-btn"><h:outputText
+                                            value="#{msg['facelet.label.cancel']}"/></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal custom-modal fade" id="isolate" role="dialog">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="form-header">
+                            <h3><h:outputText value="#{msg['facelet.label.isolate']}"/></h3>
+                            <p><h:outputText value="#{msg['facelet.label.isolate-confirm']}"/></p>
+                        </div>
+                        <div class="modal-btn delete-action">
+                            <div class="row">
+                                <div class="col-6">
+                                    <h:form>
+                                        <div class="submit-section">
+                                            <h:commandLink class="btn btn-primary continue-btn"
+                                                           action="#{assemblyController.splitBySize1}">
+                                                <h:outputText value="#{msg['facelet.label.isolate']}"/>
+                                            </h:commandLink>
+                                        </div>
+                                    </h:form>
+                                </div>
+                                <div class="col-6">
+                                    <a href="javascript:void(0);" data-dismiss="modal"
+                                       class="btn btn-primary cancel-btn"><h:outputText
+                                            value="#{msg['facelet.label.cancel']}"/></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <c:forEach items="#{workstationController.getMessageQueue()}" var="message">
+            <div class="alert">
+                <div class="alert-icon">
+                    <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                        <path fill="var(--color)" d="M10 3H14V14H10V3M10 21V17H14V21H10Z"/>
+                    </svg>
+                </div>
+
+                <p class="alert-message">
+                    <h:outputText value="#{message.getDetail()}"/>
+                </p>
+
+                <div class="spacer"></div>
+                <div class="alert-dismiss">
+                    <h:form>
+                        <h:commandLink action="#{workstationController.removeMessageQueue()}">close</h:commandLink>
+                    </h:form>
+                </div>
+            </div>
+        </c:forEach>
+    </f:view>
+</h:body>
+
+<ui:insert>
+    <ui:include src="scripts.xhtml"/>
+</ui:insert>
+
+</html>
+
+

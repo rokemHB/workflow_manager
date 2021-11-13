@@ -1,0 +1,703 @@
+<?xml version = "1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core" xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:p="http://primefaces.org/ui" xmlns:kcb="http://kcb.mschaeff.de">
+
+<h:head>
+    <title>#{msg['facelet.label.title-jobs']}</title>
+    <meta name="viewport" content="width=device-width"/>
+    <link rel="shortcut icon" type="image/x-icon" href="#{request.contextPath}/svg/favicon.ico"/>
+
+    <!-- Librarys -->
+    <link rel="stylesheet" href="css/bootstrap.css" media="all"/>
+    <link rel="stylesheet" href="css/dataTables.bootstrap4.min.css" media="all"/>
+    <link rel="stylesheet" href="css/select2.min.css" media="all"/>
+    <link rel="stylesheet" href="css/font-awesome.css" media="all"/>
+    <link rel="stylesheet" href="css/line-awesome.min.css" media="all"/>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/main.css" media="all"/>
+
+    <!-- Load early for Darkmode -->
+    <script type="text/javascript" src="js/libs/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="js/modules/darkmode_load.js"></script>
+
+
+    <!-- Scripts that need to be launched in the header -->
+    <script type="text/javascript" src="js/modules/validate.js"></script>
+    <script type="text/javascript" src="js/modules/selectBoxes.js"></script>
+</h:head>
+<h:body>
+    <!-- Custom Primfaces Theme -->
+    <link rel="stylesheet" href="css/components.css" media="all"/>
+    <f:view locale="#{localeController.currentLocale}">
+        <ui:insert>
+            <ui:include src="navigation.xhtml"/>
+        </ui:insert>
+
+        <!--                CREATE BUTTON         -->
+        <div id="view" class="main-body #{navBarController.static}">
+            <div class="page-header l-mar-32--b">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h3 class="page-title">#{msg['facelet.label.navigation.jobs']}</h3>
+                        <ul class="breadcrumb">
+                            <li class="breadcrumb-item"><a
+                                    href="dashboard.xhtml">#{msg['facelet.label.navigation.dashboard']}</a></li>
+                            <li class="breadcrumb-item active">#{msg['facelet.label.navigation.jobs']}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!--                AUSGABE ALS TABELLE (FÜR PKP -> _ALLE_ JOBS)        -->
+            <kcb:roleConditional roles="PKP">
+                <div class="row">
+                    <div class="l-grid-12">
+                        <div class="row">
+                            <div class="l-grid-12">
+                                <div class="table-responsive">
+                                    <table id="jobs" class="table table-striped custom-table datatable">
+                                        <thead>
+                                        <tr>
+                                            <th><h:outputText value="#{msg['facelet.label.name']}"/></th>
+                                            <th><h:outputText value="#{msg['facelet.label.jobstate']}"/></th>
+                                            <th><h:outputText value="#{msg['facelet.label.processchain']}"/></th>
+                                            <th><h:outputText value="#{msg['facelet.label.procedures']}"/></th>
+                                            <th><h:outputText value="#{msg['facelet.label.assemblieIDs']}"/></th>
+                                            <th><h:outputText value="#{msg['facelet.label.priority']}"/></th>
+                                            <th>Priority-Value</th>
+                                            <th><h:outputText value="#{msg['facelet.label.job-oldactive']}"/></th>
+                                            <th class="no-sort"></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <ui:repeat value="#{jobsController.entities}" var="job">
+                                            <tr>
+                                                <td>#{job.name}</td>
+                                                <td>
+                                                    <h:panelGroup rendered="#{job.jobState == 'FINISHED'}">
+                                                        <span class="badge bg-inverse-success">#{msg['facelet.label.job-state-finished']}</span>
+                                                    </h:panelGroup>
+                                                    <h:panelGroup rendered="#{job.jobState == 'CANCELLED'}">
+                                                        <span class="badge bg-inverse-danger">#{msg['facelet.label.job-state-cancelled']}</span>
+                                                    </h:panelGroup>
+                                                    <h:panelGroup rendered="#{job.jobState == 'PROCESSING'}">
+                                                        <span class="badge bg-inverse-primary">#{msg['facelet.label.job-state-processsing']}</span>
+                                                    </h:panelGroup>
+                                                    <h:panelGroup rendered="#{job.jobState == 'PENDING'}">
+                                                        <span class="badge bg-inverse-default">#{msg['facelet.label.job-state-pending']}</span>
+                                                    </h:panelGroup>
+                                                </td>
+                                                <td>#{job.processChain.name}</td>
+                                                <td>
+                                                    <ui:repeat value="#{job.procedures}" var="proc" varStatus="status">
+                                                        #{proc.processStep.name} <h:panelGroup rendered="#{!status.last}"><span class="f-w--900">&rarr;</span></h:panelGroup>
+                                                    </ui:repeat>
+                                                </td>
+                                                <td>
+                                                    <ui:repeat value="#{job.assemblies}" var="ass">
+                                                        #{ass.assemblyID}  <br/>
+                                                    </ui:repeat>
+                                                </td>
+                                                <td>
+                                                <span class="badge"
+                                                      style="background-color:#{prioritiesController.getColor(job.priority)}">#{job.priority.name}</span>
+                                                </td>
+                                                <td>#{job.priority.value}</td>
+                                                <td>
+                                                <h:panelGroup rendered="#{jobController.isOldActiveJob(job)}">
+                                                    <span class="badge bg-inverse-danger">#{msg['facelet.label.job-oldactive']}</span>
+                                                </h:panelGroup>
+                                                </td>
+                                                <td class="text-right">
+                                                    <h:form>
+                                                        <kcb:roleConditional roles="PKP">
+                                                            <div class="dropdown dropdown-action">
+                                                                <a href="#" class="action-icon dropdown-toggle"
+                                                                   data-toggle="dropdown"
+                                                                   aria-expanded="false"><em
+                                                                        class="material-icons">more_vert</em></a>
+                                                                <div class="dropdown-menu dropdown-menu-right">
+                                                            <span data-toggle="modal" data-target="#view_job">
+                                                            <p:commandLink
+                                                                    action="#{jobController.updateEntity(job)}"
+                                                                    ajax="true"
+                                                                    styleClass="dropdown-item">
+                                                                    <em class="fa fa-eye m-r-5"></em> <h:outputText
+                                                                    value="#{msg['facelet.label.view']}"/>
+                                                            </p:commandLink>
+                                                            </span>
+                                                                    <kcb:canDeleteJob job="#{job}">
+                                                                    <span data-toggle="modal" data-target="#delete_job">
+                                                            <p:commandLink
+                                                                    action="#{jobController.updateEntity(job)}"
+                                                                    ajax="true"
+                                                                    styleClass="dropdown-item">
+                                                                    <em class="fa fa-trash-alt icon-more-padding icon-more-padding m-r-5"></em> <h:outputText
+                                                                    value="#{msg['facelet.label.delete']}"/>
+                                                            </p:commandLink>
+                                                            </span></kcb:canDeleteJob>
+                                                                    <kcb:canStopJob job="#{job}">
+                                                                    <span data-toggle="modal" data-target="#stop_job">
+                                                            <p:commandLink
+                                                                    action="#{jobController.updateEntity(job)}"
+                                                                    ajax="true"
+                                                                    styleClass="dropdown-item">
+                                                                    <em class="fa fa-ban m-r-5"></em> <h:outputText
+                                                                    value="#{msg['facelet.label.stop']}"/>
+                                                            </p:commandLink>
+                                                            </span></kcb:canStopJob>
+                                                                    <p:commandButton ajax="false"
+                                                                                     value="#{msg['facelet.label.protocol']}"
+                                                                                     onclick="PrimeFaces.monitorDownload(start, stop);"
+                                                                                     icon="fa fa-download icon-more-padding m-r-5"
+                                                                                     style="display: block;width: 100%;padding: 0px !important;clear: both;font-weight: 400;color: #212529;text-align: inherit;white-space: nowrap;background-color: transparent;border: none;"
+                                                                                     styleClass="special-download">
+                                                                        <p:fileDownload
+                                                                                value="#{jobsController.generateProtocol(job)}"/>
+                                                                    </p:commandButton>
+                                                                    <p:commandButton ajax="false"
+                                                                                     value="#{msg['facelet.label.export-param']}"
+                                                                                     onclick="PrimeFaces.monitorDownload(start, stop);"
+                                                                                     icon="fa fa-download icon-more-padding m-r-5"
+                                                                                     style="display: block;width: 100%;padding: 0px !important;clear: both;font-weight: 400;color: #212529;text-align: inherit;white-space: nowrap;background-color: transparent;border: none;"
+                                                                                     styleClass="special-download">
+                                                                        <p:fileDownload
+                                                                                value="#{jobsController.exportParameters(job)}"/>
+                                                                    </p:commandButton>
+                                                                </div>
+                                                            </div>
+                                                        </kcb:roleConditional>
+                                                    </h:form>
+                                                </td>
+                                            </tr>
+                                        </ui:repeat>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </kcb:roleConditional>
+
+            <!--                AUSGABE ALS TABELLE (FÜR LOGISTIKER -> _PENDING_ JOBS)        -->
+            <kcb:roleConditional roles="LOGISTIKER">
+                <div class="row">
+                    <div class="l-grid-12">
+                        <div class="row">
+                            <div class="l-grid-12">
+                                <div class="table-responsive">
+                                    <table id="job_logistiker" class="table table-striped custom-table datatable"
+                                           data-module="table">
+                                        <thead>
+                                        <tr>
+                                            <th><h:outputText value="#{msg['facelet.label.job']}"/></th>
+                                            <th class="table-hidden"><h:outputText
+                                                    value="#{msg['facelet.label.processchain']}"/></th>
+                                            <th class="table-hidden"><h:outputText
+                                                    value="#{msg['facelet.label.attributes']}"/></th>
+                                            <th class="table-hidden"><h:outputText
+                                                    value="#{msg['facelet.label.preparation']}"/></th>
+                                            <th><h:outputText value="#{msg['facelet.label.priority']}"/></th>
+                                            <th>Priority-Value</th>
+                                            <th class="no-sort"></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <ui:repeat value="#{jobsController.getPending()}" var="job">
+                                            <tr>
+                                                <td>#{job.name}</td>
+                                                <td>#{job.processChain.name}</td>
+                                                <td>
+                                                    <h:panelGroup rendered="#{jobController.isCreating(job)}">
+                                                        <span class="badge bg-inverse-success">#{msg['facelet.label.creates']}</span>
+                                                    </h:panelGroup>
+                                                    <h:panelGroup rendered="#{jobController.isDeleting(job)}">
+                                                        <span class="badge bg-inverse-danger">#{msg['facelet.label.destroys']}</span>
+                                                    </h:panelGroup>
+                                                    <h:panelGroup rendered="#{jobController.isModifying(job)}">
+                                                        <span class="badge bg-inverse-info">#{msg['facelet.label.modifies']}</span>
+                                                    </h:panelGroup>
+                                                </td>
+                                                <td class="table-hidden"> #{jobController.getCurrentPreparation(job).name}</td>
+                                                <td class="table-hidden">
+                                                <span class="badge"
+                                                      style="background-color:#{prioritiesController.getColor(job.priority)}">#{job.priority.name}</span>
+                                                </td>
+                                                <td>#{job.priority.value}</td>
+                                                <td class="text-right">
+                                                    <h:form>
+                                                        <kcb:roleConditional roles="LOGISTIKER">
+                                                            <div class="dropdown dropdown-action">
+                                                                <a href="#" class="action-icon dropdown-toggle"
+                                                                   data-toggle="dropdown"
+                                                                   aria-expanded="false"><em
+                                                                        class="material-icons">more_vert</em></a>
+                                                                <div class="dropdown-menu dropdown-menu-right">
+                                                                            <span data-toggle="modal"
+                                                                                  data-target="#add-job-assembly">
+                                                                    <p:commandLink
+                                                                            action="#{jobController.updateEntity(job)}"
+                                                                            ajax="true"
+                                                                            styleClass="dropdown-item">
+                                                                        <em class="fa fa-play m-r-5"></em> <h:outputText
+                                                                            value="#{msg['facelet.label.start-job']}"/>
+                                                                    </p:commandLink>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </kcb:roleConditional>
+                                                    </h:form>
+                                                </td>
+                                            </tr>
+                                        </ui:repeat>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </kcb:roleConditional>
+
+            <!--                ADD JOB DIALOG (POP UP)         -->
+            <div id="add_job" class="modal custom-modal fade" role="dialog" aria-modal="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><h:outputText value="#{msg['facelet.label.add-job']}"/>
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <f:view>
+                                <f:event type="preRenderView" listener="#{jobsController.refresh()}"/>
+                                <!-- Hier stand vorher: reset(), wurde rausgenommen, weil sonst verbugt--> 
+                                <h:form onsubmit="">
+                                    <script type="application/javascript">update();</script>
+                                    <script type="application/javascript">select2();</script>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label><h:outputText value="#{msg['facelet.label.name']}"/><span
+                                                        class="text-danger">*</span></label>
+                                                <h:inputText id="name" value="#{jobController.entity.name}"
+                                                             class="form-control job-name" type="text"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label><h:outputText
+                                                        value="#{msg['facelet.label.processchain']}"/></label>
+                                                <h:selectOneMenu class="select"
+                                                                 value="#{jobController.entity.processChain}">
+                                                    <f:selectItems value="#{processchainsController.entities}" var="pc"
+                                                                   itemLabel="#{pc.name}" itemValue="#{pc}"/>
+                                                </h:selectOneMenu>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label><h:outputText
+                                                        value="#{msg['facelet.label.priority']}"/></label>
+                                                <h:selectOneListbox class="select"
+                                                                    value="#{jobController.entity.priority}">
+                                                    <f:selectItems value="#{prioritiesController.entities}" var="p"
+                                                                   itemLabel="#{p.value}" itemValue="#{p}"/>
+                                                </h:selectOneListbox>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label><h:outputText
+                                                        value="#{msg['facelet.label.assemblies']}"/></label>
+                                                <h:selectManyListbox class="select"
+                                                                     value="#{jobController.entity.assemblies}"
+                                                                     collectionType="java.util.ArrayList">
+                                                    <f:selectItems value="#{assembliesController.entities}" var="ass"
+                                                                   itemLabel="#{ass.assemblyID}" itemValue="#{ass}"/>
+                                                </h:selectManyListbox>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="submit-section">
+                                        <h:commandLink class="btn btn--primary submit-btn"
+                                                       action="#{jobController.create()}">
+                                            <h:outputText value="#{msg['facelet.label.create']}"/>
+                                        </h:commandLink>
+                                    </div>
+                                </h:form>
+                            </f:view>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--                           EDIT JOB (FOR LOGISTIKER) (POP UP)                      -->
+            <div id="add-job-assembly" class="modal custom-modal fade" role="dialog">
+                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">#{msg['facelet.label.add-assembly']}</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <h:form id="add_assembly_form">
+                                <script type="application/javascript">select2();</script>
+                                <h:panelGroup rendered="#{jobController.isCreating(jobController.entity)}">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <h:outputText value="#{msg['facelet.detail.add-assembly-to-job-notice']}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{!jobController.isCreating(jobController.entity)}">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label><h:outputText value="#{msg['facelet.label.assemblies']}"/><span
+                                                        class="text-danger">*</span></label>
+                                                <h:selectManyListbox class="select"
+                                                                     value="#{jobController.entity.assemblies}"
+                                                                     collectionType="java.util.ArrayList">
+                                                    <c:forEach
+                                                            items="#{assembliesController.filterNotInActiveJob(assembliesController.getByCarrierType(jobController.getCurrentPreparation(jobController.entity)))}"
+                                                            var="assembly">
+                                                        <f:selectItem itemValue="#{assembly}"
+                                                                      itemLabel="#{assembly.assemblyID}"/>
+                                                    </c:forEach>
+                                                </h:selectManyListbox>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                                <div class="submit-section ml-auto">
+                                    <h:commandLink class="btn btn--primary submit-btn"
+                                                   action="#{jobController.start()}">
+                                        <h:outputText value="#{msg['facelet.label.start-job']}"/>
+                                    </h:commandLink>
+                                </div>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--                           EDIT JOB (FOR PKP) (POP UP)                      -->
+            <div id="edit_job" class="modal custom-modal fade" role="dialog">
+                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><h:outputText value="#{msg['facelet.label.edit-job']}"/></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <h:form id="job_edit_form">
+                                <script type="application/javascript">update();</script>
+                                <script type="application/javascript">select2();</script>
+                                <div class="row">
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label><h:outputText value="#{msg['facelet.label.name']}"/><span
+                                                    class="text-danger">*</span></label>
+                                            <h:inputText value="#{jobController.entity.name}"
+                                                         class="form-control job-name valid" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label><h:outputText
+                                                    value="#{msg['facelet.label.processchain']}"/><span
+                                                    class="text-danger">*</span></label>
+                                            <h:selectOneMenu class="select"
+                                                             value="#{jobController.entity.processChain}">
+                                                <f:selectItems value="#{processchainsController.entities}" var="pc"
+                                                               itemLabel="#{pc.name}" itemValue="#{pc}"/>
+                                            </h:selectOneMenu>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label><h:outputText
+                                                    value="#{msg['facelet.label.priority']}"/><span
+                                                    class="text-danger">*</span></label>
+                                            <h:selectOneListbox class="select" value="#{jobController.entity.priority}">
+                                                <f:selectItems value="#{prioritiesController.entities}" var="p"
+                                                               itemLabel="#{p.value}" itemValue="#{p}"/>
+                                            </h:selectOneListbox>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label><h:outputText
+                                                    value="#{msg['facelet.label.assemblies']}"/></label>
+                                            <h:selectManyListbox class="select"
+                                                                 value="#{jobController.entity.assemblies}"
+                                                                 collectionType="java.util.ArrayList">
+                                                <f:selectItems value="#{assembliesController.entities}" var="ass"
+                                                               itemLabel="#{ass.assemblyID}" itemValue="#{ass}"/>
+                                            </h:selectManyListbox>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="submit-section">
+                                    <h:commandLink class="btn btn--primary submit-btn"
+                                                   action="#{jobController.update()}">
+                                        <h:outputText value="#{msg['facelet.label.save']}"/>
+                                    </h:commandLink>
+                                </div>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--                           VIEW JOB AND PROCEDURES (POP UP)                      -->
+            <div id="view_job" class="modal custom-modal fade" role="dialog">
+                <div class="modal-dialog modal-dialog-centered modal-xxl" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><h:outputText value="#{msg['facelet.label.view-job']}"/>
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <h:form id="job_view_form">
+                                <script type="application/javascript">select2();</script>
+                                <div class="row">
+                                    <div class="l-grid-12">
+                                        <div class="table-responsive">
+                                            <table id="start_processchain-table"
+                                                   class="table table-striped custom-table datatable">
+                                                <thead>
+                                                <tr>
+                                                    <th>#{msg['facelet.label.procedures']}</th>
+                                                    <th>#{msg['facelet.label.statemachine-states']}</th>
+                                                    <th class="no-sort"></th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+
+                                                <ui:repeat value="#{jobController.entity.procedures}" var="procedure">
+                                                    <tr>
+                                                        <td>#{procedure.processStep.name}</td>
+                                                        <td>
+                                                            <div class="row l-mar-8--t">
+                                                                <div class="col-md-12">
+                                                                    <ui:repeat
+                                                                            value="#{procedure.processStep.stateMachine.stateList}"
+                                                                            var="state">
+                                                                        <h:panelGroup
+                                                                                rendered="#{stateController.isComplete(state, procedure)}">
+                                                                            <a class="help-cursor" data-toggle="tooltip"
+                                                                               data-placement="top"
+                                                                               title="#{state.name}">
+                                                                <span class="completed action-circle large complete-btn">
+                                                                    <em class="material-icons">check</em>
+                                                                        </span>
+                                                                            </a>
+                                                                        </h:panelGroup>
+                                                                        <h:panelGroup
+                                                                                rendered="#{stateController.isPending(state, procedure)}">
+                                                                            <a class="help-cursor" data-toggle="tooltip"
+                                                                               data-placement="top"
+                                                                               title="#{state.name}">
+                                                                <span class="pending action-circle large complete-btn">
+                                                                    <em class="material-icons">check</em>
+                                                                        </span>
+                                                                            </a>
+                                                                        </h:panelGroup>
+                                                                        <h:panelGroup
+                                                                                rendered="#{stateController.isComplete(state, procedure) == false and stateController.isPending(state, procedure) == false}">
+                                                                            <a class="help-cursor" data-toggle="tooltip"
+                                                                               data-placement="top"
+                                                                               title="#{state.name}">
+                                                                <span class="action-circle large complete-btn">
+                                                                    <em class="material-icons">access_time</em>
+                                                                        </span>
+                                                                            </a>
+                                                                        </h:panelGroup>
+                                                                    </ui:repeat>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <kcb:roleConditional roles="TECHNOLOGE, PKP" operation="OR">
+                                                                <div class="dropdown dropdown-action">
+                                                                    <a href="#" class="action-icon dropdown-toggle"
+                                                                       data-toggle="dropdown"
+                                                                       aria-expanded="false"><em
+                                                                            class="material-icons">more_vert</em></a>
+                                                                    <div class="dropdown-menu dropdown-menu-right">
+                                                                        <p:commandButton ajax="true"
+                                                                                         value="#{msg['facelet.label.export-param']}"
+                                                                                         onclick="PrimeFaces.monitorDownload(start, stop);"
+                                                                                         icon="fa fa-download icon-more-padding m-r-5"
+                                                                                         style="display: block;width: 100%;padding: 0px !important;clear: both;font-weight: 400;color: #212529;text-align: inherit;white-space: nowrap;background-color: transparent;border: none;"
+                                                                                         styleClass="special-download">
+                                                                            <p:fileDownload
+                                                                                    value="#{proceduresController.exportParameters(procedure)}"/>
+                                                                        </p:commandButton>
+                                                                    </div>
+                                                                </div>
+                                                            </kcb:roleConditional>
+                                                        </td>
+                                                    </tr>
+                                                </ui:repeat>
+                                                <!-- Harcoded TEST -->
+
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </h:form>
+                            <kcb:roleConditional roles="TECHNOLOGE, PKP" operation="OR">
+                                <h:form>
+                                    <p:commandButton ajax="false"
+                                                     value="#{msg['facelet.label.export-param']}"
+                                                     onclick="PrimeFaces.monitorDownload(start, stop);"
+                                                     icon="fa fa-download icon-more-padding m-r-5"
+                                                     style="display: block;width: 100%;padding: 0px !important;clear: both;font-weight: 400;color: #212529;text-align: inherit;white-space: nowrap;background-color: transparent;border: none;"
+                                                     styleClass="special-download">
+                                        <p:fileDownload
+                                                value="#{jobController.exportParameters()}"/>
+                                    </p:commandButton>
+                                </h:form>
+                            </kcb:roleConditional>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--                    CONFIRM START CREATING JOB (POP UP)                        -->
+            <div class="modal custom-modal fade" id="start_creating_job_confirm" role="dialog">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <div class="form-header">
+                                <h3><h:outputText value="#{msg['facelet.label.start-job']}"/></h3>
+                                <p><h:outputText value="#{msg['facelet.label.start-job-confirm']}"/></p>
+                            </div>
+                            <div class="modal-btn delete-action">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <h:form id="start_creating_job_confirm_form">
+                                            <script type="application/javascript">select2();</script>
+                                            <div class="submit-section">
+                                                <h:commandLink class="btn btn-primary continue-btn"
+                                                               action="#{jobController.start()}">
+                                                    <h:outputText value="#{msg['facelet.label.start']}"/>
+                                                </h:commandLink>
+                                            </div>
+                                        </h:form>
+                                    </div>
+                                    <div class="col-6">
+                                        <a href="javascript:void(0);" data-dismiss="modal"
+                                           class="btn btn-primary cancel-btn"><h:outputText
+                                                value="#{msg['facelet.label.cancel']}"/></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--                    DELETE JOB (POP UP)                        -->
+            <div class="modal custom-modal fade" id="delete_job" role="dialog">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <div class="form-header">
+                                <h3><h:outputText value="#{msg['facelet.label.delete-job']}"/></h3>
+                                <p><h:outputText value="#{msg['facelet.label.delete-job-confirm']}"/></p>
+                            </div>
+                            <div class="modal-btn delete-action">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <h:form>
+                                            <div class="submit-section">
+                                                <h:commandLink class="btn btn-primary continue-btn"
+                                                               action="#{jobController.delete()}">
+                                                    <h:outputText value="#{msg['facelet.label.delete']}"/>
+                                                </h:commandLink>
+                                            </div>
+                                        </h:form>
+                                    </div>
+                                    <div class="col-6">
+                                        <a href="javascript:void(0);" data-dismiss="modal"
+                                           class="btn btn-primary cancel-btn"><h:outputText
+                                                value="#{msg['facelet.label.cancel']}"/></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--                    STOP JOB (POP UP)                        -->
+            <div class="modal custom-modal fade" id="stop_job" role="dialog">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <div class="form-header">
+                                <h3><h:outputText value="#{msg['facelet.label.stop-job']}"/></h3>
+                                <p><h:outputText value="#{msg['facelet.label.stop-job-confirm']}"/></p>
+                            </div>
+                            <div class="modal-btn delete-action">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <h:form>
+                                            <div class="submit-section">
+                                                <h:commandLink class="btn btn-primary continue-btn"
+                                                               action="#{jobController.stop()}">
+                                                    <h:outputText value="#{msg['facelet.label.stop']}"/>
+                                                </h:commandLink>
+                                            </div>
+                                        </h:form>
+                                    </div>
+                                    <div class="col-6">
+                                        <a href="javascript:void(0);" data-dismiss="modal"
+                                           class="btn btn-primary cancel-btn"><h:outputText
+                                                value="#{msg['facelet.label.cancel']}"/></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </f:view>
+</h:body>
+<ui:insert>
+    <ui:include src="scripts.xhtml"/>
+</ui:insert>
+</html>

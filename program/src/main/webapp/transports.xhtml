@@ -1,0 +1,199 @@
+<?xml version = "1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui" xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+<h:head>
+    <title>#{msg['facelet.label.title-transports']}</title>
+    <meta name="viewport" content="width=device-width"/>
+    <link rel="shortcut icon" type="image/x-icon" href="#{request.contextPath}/svg/favicon.ico"/>
+
+    <!-- Librarys -->
+    <link rel="stylesheet" href="css/bootstrap.css" media="all"/>
+    <link rel="stylesheet" href="css/dataTables.bootstrap4.min.css" media="all"/>
+    <link rel="stylesheet" href="css/select2.min.css" media="all"/>
+    <link rel="stylesheet" href="css/font-awesome.css" media="all"/>
+    <link rel="stylesheet" href="css/line-awesome.min.css" media="all"/>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/main.css" media="all"/>
+
+    <!-- Load early for Darkmode -->
+    <script type="text/javascript" src="js/libs/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="js/modules/darkmode_load.js"></script>
+
+    <!-- Scripts that need to be launched in the header -->
+    <script type="text/javascript" src="js/modules/validate.js"></script>
+    <script type="text/javascript" src="js/modules/selectBoxes.js"></script>
+</h:head>
+<h:body>
+    <!-- Custom Primfaces Theme -->
+    <link rel="stylesheet" href="css/components.css" media="all"/>
+    <f:view locale="#{localeController.currentLocale}">
+        <ui:insert>
+            <ui:include src="navigation.xhtml"/>
+        </ui:insert>
+
+
+        <div id="view" class="main-body #{navBarController.static}">
+
+            <div class="page-header l-mar-32--b">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h3 class="page-title">#{msg['facelet.label.navigation.transport']}</h3>
+                        <ul class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="dashboard.xhtml">#{msg['facelet.label.navigation.dashboard']}</a></li>
+                            <li class="breadcrumb-item active">#{msg['facelet.label.navigation.transport']}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="l-grid-12">
+                    <div class="row">
+                        <div class="l-grid-12">
+                            <div class="table-responsive">
+                                <table id="users" class="table table-striped custom-table datatable">
+                                    <thead>
+                                    <tr>
+                                        <th><h:outputText value="#{msg['facelet.label.transport-job']}"/></th>
+                                        <th><h:outputText value="#{msg['facelet.label.transport-priority']}"/></th>
+                                        <th><h:outputText value="#{msg['facelet.label.assemblies']}"/></th>
+                                        <th><h:outputText value="#{msg['facelet.label.transport-position']}"/></th>
+                                        <th><h:outputText value="#{msg['facelet.label.transport-nextposition']}"/></th>
+                                        <th></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <ui:repeat value="#{jobsController.getJobsThatNeedTransport()}" var="job">
+                                    <tr>
+                                        <td>#{job.name}</td>
+                                        <td><span class="badge"
+                                                      style="background-color:#{prioritiesController.getColor(job.priority)}">#{job.priority.name}</span></td>
+                                        <td><ui:repeat value="#{job.assemblies}" var="assembly">
+                                            #{assembly.assemblyID}  <br/>
+                                        </ui:repeat></td>
+                                        <td>#{job.assemblies.get(0).carriers.get(0).location.position}</td>
+                                        <td>#{jobController.getNextPosition(job)}</td>
+                                        <td class="text-right">
+                                            <span data-toggle="modal"
+                                                  data-target="#confirm_collection">
+                                                <p:commandButton rendered="#{carrierController.canCollect(job.assemblies.get(0).carriers.get(0))}" value="#{msg['facelet.label.collect']}" ajax="true"
+                                                                action="#{jobController.updateEntity(job)}">
+                                                </p:commandButton></span>
+                                            <span data-toggle="modal"
+                                                  data-target="#confirm_delivery">
+                                                <p:commandButton rendered="#{carrierController.canDeliver(job.assemblies.get(0).carriers.get(0))}" value="#{msg['facelet.label.deliver']}" ajax="true"
+                                                             action="#{jobController.updateEntity(job)}">
+                                                </p:commandButton></span>
+                                        </td>
+                                    </tr>
+                                    </ui:repeat>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--                    CONFIRM COLLECTION (POP UP)                        -->
+            <div class="modal custom-modal fade" id="confirm_collection" role="dialog">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <div class="form-header">
+                                <h3><h:outputText value="#{msg['facelet.label.collect']}"/></h3>
+                                <p><h:outputText value="#{msg['facelet.label.collect-confirm']}"/></p>
+                            </div>
+                            <div class="modal-btn delete-action">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <h:form>
+                                            <div class="submit-section">
+                                                <h:commandLink class="btn btn-primary continue-btn"
+                                                               action="#{jobController.collectJobsAssemblies()}">
+                                                    <h:outputText value="#{msg['facelet.label.collect']}"/>
+                                                </h:commandLink>
+                                            </div>
+                                        </h:form>
+                                    </div>
+                                    <div class="col-6">
+                                        <a href="javascript:void(0);" data-dismiss="modal"
+                                           class="btn btn-primary cancel-btn"><h:outputText
+                                                value="#{msg['facelet.label.cancel']}"/></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--                    CONFIRM DELIVERY (POP UP)                        -->
+            <div class="modal custom-modal fade" id="confirm_delivery" role="dialog">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <div class="form-header">
+                                <h3><h:outputText value="#{msg['facelet.label.deliver']}"/></h3>
+                                <p><h:outputText value="#{msg['facelet.label.deliver-confirm']}"/></p>
+                            </div>
+                            <div class="modal-btn delete-action">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <h:form>
+                                            <div class="submit-section">
+                                                <h:commandLink class="btn btn-primary continue-btn"
+                                                               action="#{jobController.deliverJobsAssemblies()}">
+                                                    <h:outputText value="#{msg['facelet.label.deliver']}"/>
+                                                </h:commandLink>
+                                            </div>
+                                        </h:form>
+                                    </div>
+                                    <div class="col-6">
+                                        <a href="javascript:void(0);" data-dismiss="modal"
+                                           class="btn btn-primary cancel-btn"><h:outputText
+                                                value="#{msg['facelet.label.cancel']}"/></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </f:view>
+    <c:forEach items="#{stateController.getMessageQueue()}" var="message">
+        <div class="alert">
+            <div class="alert-icon">
+                <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                    <path fill="var(--color)" d="M10 3H14V14H10V3M10 21V17H14V21H10Z"/>
+                </svg>
+            </div>
+
+            <p class="alert-message">
+                <h:outputText value="#{message.getDetail()}"/>
+            </p>
+
+            <div class="spacer"></div>
+            <div class="alert-dismiss">
+                <h:form>
+                    <h:commandLink action="#{stateController.removeMessageQueue()}">close</h:commandLink>
+                </h:form>
+            </div>
+        </div>
+    </c:forEach>
+</h:body>
+<ui:insert>
+    <ui:include src="scripts.xhtml"/>
+</ui:insert>
+</html>
+
+

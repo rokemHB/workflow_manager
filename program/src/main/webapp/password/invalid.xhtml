@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html">
+<h:head>
+    <title>#{msg['facelet.login.enter-new-password.invalidToken.title']}</title>
+    <meta name="viewport" content="width=device-width"/>
+
+    <link rel="shortcut icon" type="image/x-icon" href="#{request.contextPath}/svg/favicon.ico"/>
+    <!-- Librarys -->
+    <link rel="stylesheet" href="../css/bootstrap.css" media="all"/>
+    <!-- End Librarys -->
+
+    <!-- Custom CSS and PatternLab -->
+    <link rel="stylesheet" href="../css/main.css" media="all"/>
+    <!-- End Custom CSS and PatternLab -->
+</h:head>
+<h:body class="error-page">
+    <div class="main-wrapper">
+        <div class="error-box">
+            <h1>401</h1>
+            <h3><em class="fa fa-warning"></em>#{msg['facelet.login.enter-new-password.invalidToken.title']}</h3>
+            <p>#{msg['facelet.login.enter-new-password.invalidToken']}</p>
+            <a href="../login.xhtml" class="btn btn-custom">#{msg['error.page.startpage']}</a>
+            <a href="reset.xhtml" class="btn btn-custom">#{msg['facelet.label.request-new']}</a>
+        </div>
+    </div>
+</h:body>
+</html>
